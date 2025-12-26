@@ -227,3 +227,114 @@ export function convertIngredient(
   return null;
 }
 
+/**
+ * Converts weight/volume information found in note text
+ * Handles patterns like "150g each", "5.3 oz each", "200ml", etc.
+ * @param note - The note text that may contain weight/volume info
+ * @param to - Target unit system
+ * @returns Converted note text, or original if no conversion needed
+ */
+export function convertNote(note: string | undefined, to: UnitSystem): string {
+  if (!note) return note || '';
+
+  // Pattern to match: number (with optional decimal) followed by unit (g, kg, oz, lb, ml, l, fl oz, qt)
+  // Examples: "150g", "150 g", "5.3 oz", "200ml each", "1.5 kg"
+  const weightPattern = /\b(\d+(?:\.\d+)?)\s*(g|kg|oz|lb|ml|l|fl\s*oz|qt)\b/gi;
+
+  return note.replace(weightPattern, (match, amountStr, unitStr) => {
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount)) return match;
+
+    // Normalize unit, handling "floz" -> "fl oz"
+    let normalizedUnit = unitStr.replace(/\s+/g, ' ').toLowerCase().trim();
+    if (normalizedUnit === 'floz') {
+      normalizedUnit = 'fl oz';
+    } else {
+      normalizedUnit = normalizeUnit(normalizedUnit);
+    }
+    
+    // Don't convert count-like units or non-convertible units
+    if (COUNT_UNITS.has(normalizedUnit) || !CONVERTIBLE_UNITS.has(normalizedUnit)) {
+      return match;
+    }
+
+    // Determine source system
+    const isMetricUnit = normalizedUnit === 'g' || normalizedUnit === 'kg' || normalizedUnit === 'ml' || normalizedUnit === 'l';
+    const isUSUnit = normalizedUnit === 'oz' || normalizedUnit === 'lb' || normalizedUnit === 'fl oz' || normalizedUnit === 'qt';
+
+    // Only convert if unit doesn't match target system
+    if (to === 'metric' && isUSUnit) {
+      const conversion = CONVERSIONS[normalizedUnit as keyof typeof CONVERSIONS];
+      if (!conversion) return match;
+
+      let convertedAmount = amount * conversion.toMetric;
+      let convertedUnit: string;
+
+      if (normalizedUnit === 'oz') {
+        convertedUnit = 'g';
+      } else if (normalizedUnit === 'lb') {
+        if (convertedAmount >= 1000) {
+          convertedAmount = convertedAmount / 1000;
+          convertedUnit = 'kg';
+        } else {
+          convertedUnit = 'g';
+        }
+      } else if (normalizedUnit === 'fl oz') {
+        convertedUnit = 'ml';
+      } else if (normalizedUnit === 'qt') {
+        if (convertedAmount >= 1000) {
+          convertedAmount = convertedAmount / 1000;
+          convertedUnit = 'l';
+        } else {
+          convertedUnit = 'ml';
+        }
+      } else {
+        return match;
+      }
+
+      // Preserve original spacing pattern (check if original had space)
+      const hadSpace = /\s/.test(match.substring(amountStr.length));
+      return `${formatAmount(convertedAmount)}${hadSpace ? ' ' : ''}${convertedUnit}`;
+    } else if (to === 'us' && isMetricUnit) {
+      let convertedAmount: number;
+      let convertedUnit: string;
+
+      if (normalizedUnit === 'g') {
+        convertedAmount = amount * CONVERSIONS.oz.toUS;
+        convertedUnit = 'oz';
+      } else if (normalizedUnit === 'kg') {
+        const grams = amount * 1000;
+        convertedAmount = grams * CONVERSIONS.lb.toUS;
+        if (convertedAmount >= 1) {
+          convertedUnit = 'lb';
+        } else {
+          convertedAmount = grams * CONVERSIONS.oz.toUS;
+          convertedUnit = 'oz';
+        }
+      } else if (normalizedUnit === 'ml') {
+        convertedAmount = amount * CONVERSIONS['fl oz'].toUS;
+        convertedUnit = 'fl oz';
+      } else if (normalizedUnit === 'l') {
+        const milliliters = amount * 1000;
+        const quarts = milliliters * CONVERSIONS.qt.toUS;
+        if (quarts >= 1) {
+          convertedAmount = quarts;
+          convertedUnit = 'qt';
+        } else {
+          convertedAmount = milliliters * CONVERSIONS['fl oz'].toUS;
+          convertedUnit = 'fl oz';
+        }
+      } else {
+        return match;
+      }
+
+      // Preserve original spacing pattern (check if original had space)
+      const hadSpace = /\s/.test(match.substring(amountStr.length));
+      return `${formatAmount(convertedAmount)}${hadSpace ? ' ' : ''}${convertedUnit}`;
+    }
+
+    // Unit already matches target system, return original
+    return match;
+  });
+}
+

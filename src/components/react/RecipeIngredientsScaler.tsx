@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { buttonClasses } from '../ui/classes';
-import { convertIngredient, formatAmount, type UnitSystem } from '../../lib/units';
+import { convertIngredient, convertNote, formatAmount, type UnitSystem } from '../../lib/units';
 
 interface Ingredient {
   amount: number;
@@ -220,7 +220,13 @@ export function RecipeIngredientsScaler({
               }
             }
 
-            // Step 3: Format amount
+            // Step 3: Convert weights/volumes in note if unit toggle is enabled
+            let note = ingredient.note;
+            if (unitToggleEnabled && note) {
+              note = convertNote(note, unitSystem);
+            }
+
+            // Step 4: Format amount
             const formattedAmount = formatAmount(amount);
 
             return (
@@ -234,9 +240,9 @@ export function RecipeIngredientsScaler({
                   </span>
                 )}
                 <span className="flex-1 min-w-[200px]">{ingredient.name}</span>
-                {ingredient.note && (
+                {note && (
                   <span className="text-[color:var(--muted)] text-[0.9375rem] italic">
-                    {ingredient.note}
+                    {note}
                   </span>
                 )}
               </li>
