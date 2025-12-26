@@ -19,14 +19,16 @@ interface RecipeIngredientsScalerProps {
 /**
  * Formats a number cleanly:
  * - Rounds to max 2 decimals
- * - Strips trailing zeros (1.50 → 1.5, 2.00 → 2)
+ * - Strips trailing zeros after decimal point (1.50 → 1.5, 2.00 → 2)
  * - Avoids showing -0
  */
 function formatAmount(amount: number): string {
   if (amount === 0) return '';
   const rounded = Math.round(amount * 100) / 100;
   const formatted = rounded.toString();
-  return formatted.replace(/\.?0+$/, '');
+  // Only strip trailing zeros after a decimal point
+  // This handles both "2.00" → "2" and "1.50" → "1.5"
+  return formatted.replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
 }
 
 /**
@@ -42,24 +44,25 @@ export function RecipeIngredientsScaler({
 }: RecipeIngredientsScalerProps) {
   const storageKey = `tsk.servings.${slug}`;
 
-  // Initialize servings from localStorage or use baseServings
-  const [servings, setServings] = useState<number>(() => {
-    if (typeof window === 'undefined') return baseServings;
+  // Initialize with baseServings to match server render (avoid hydration mismatch)
+  const [servings, setServings] = useState<number>(baseServings);
+
+  // Load from localStorage after mount (client-side only)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     
     try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = parseInt(stored, 10);
         if (!isNaN(parsed) && parsed >= minServings && parsed <= maxServings) {
-          return parsed;
+          setServings(parsed);
         }
       }
     } catch (error) {
       // localStorage may be unavailable, ignore
     }
-    
-    return baseServings;
-  });
+  }, [storageKey, minServings, maxServings]);
 
   // Persist servings to localStorage when changed
   useEffect(() => {
