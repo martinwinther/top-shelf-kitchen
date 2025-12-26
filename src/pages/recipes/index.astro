@@ -1,46 +1,28 @@
 ---
+import { getCollection } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import GlassCard from '../../components/ui/GlassCard.astro';
 import Button from '../../components/ui/Button.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Toggle from '../../components/ui/Toggle.astro';
 import Modal from '../../components/ui/Modal.astro';
+
+const recipes = await getCollection('recipes');
 ---
 
 <SiteLayout title="Recipes">
   <div class="page-content">
     <header class="page-header">
-      <h1>Recipes</h1>
+      <h1>Recipes ({recipes.length})</h1>
       <p class="subtitle">Only the keepers. No filler.</p>
     </header>
 
-    <section class="recipes-grid">
-      <!-- Placeholder cards - will be replaced with actual recipes from content collections -->
-      <GlassCard as="article" hover class="recipe-card">
-        <div class="recipe-meta">Coming Soon</div>
-        <h2 class="recipe-title">Recipe Collection</h2>
-        <p class="recipe-desc">
-          The recipe collection is being prepared. Check back soon for curated, 
-          no-nonsense recipes.
-        </p>
-      </GlassCard>
-
-      <GlassCard as="article" hover class="recipe-card">
-        <div class="recipe-meta">Placeholder</div>
-        <h2 class="recipe-title">Sample Recipe</h2>
-        <p class="recipe-desc">
-          Each recipe will include scaling, unit conversion, and a cooking mode 
-          for distraction-free cooking.
-        </p>
-      </GlassCard>
-
-      <GlassCard as="article" hover class="recipe-card">
-        <div class="recipe-meta">Template</div>
-        <h2 class="recipe-title">Your Recipe Here</h2>
-        <p class="recipe-desc">
-          Add your own recipes using Markdown files with structured frontmatter.
-        </p>
-      </GlassCard>
+    <section class="recipes-list">
+      <ul>
+        {recipes.map((recipe) => (
+          <li>{recipe.data.title}</li>
+        ))}
+      </ul>
     </section>
 
     <section class="section">
@@ -111,47 +93,16 @@ import Modal from '../../components/ui/Modal.astro';
     margin-top: 0.5rem;
   }
 
-  .recipes-grid {
-    display: grid;
-    gap: 1.5rem;
+  .recipes-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 
-  @media (min-width: 640px) {
-    .recipes-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .recipes-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .recipe-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .recipe-meta {
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-  }
-
-  .recipe-title {
-    font-size: 1.25rem;
+  .recipes-list li {
+    padding: 0.5rem 0;
     color: var(--text);
-    line-height: 1.3;
-  }
-
-  .recipe-desc {
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.6;
+    font-size: 1.125rem;
   }
 
   .section {
