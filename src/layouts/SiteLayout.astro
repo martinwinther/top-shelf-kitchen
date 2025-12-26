@@ -5,10 +5,37 @@ import Button from '../components/ui/Button.astro';
 
 interface Props {
   title?: string;
+  description?: string;
+  canonicalPath?: string;
+  ogImage?: string;
 }
 
-const { title } = Astro.props;
-const pageTitle = title ? `${title} | ${siteConfig.site.name}` : siteConfig.site.name;
+const { title, description, canonicalPath, ogImage } = Astro.props;
+
+// Build page title
+const pageTitle = title ? `${title} — ${siteConfig.site.name}` : siteConfig.site.name;
+
+// Build description (fallback to default)
+const pageDescription = description || siteConfig.features.seo.defaultDescription;
+
+// Build canonical URL (only if site.url is set)
+const canonicalUrl =
+  siteConfig.site.url && canonicalPath
+    ? `${siteConfig.site.url}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`
+    : undefined;
+
+// Build OG image URL
+const ogImageUrl =
+  ogImage && siteConfig.features.seo.ogImages
+    ? ogImage.startsWith('http')
+      ? ogImage
+      : `${siteConfig.site.url}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`
+    : siteConfig.features.seo.ogImages && siteConfig.features.seo.ogImagePath
+    ? `${siteConfig.site.url}${siteConfig.features.seo.ogImagePath}`
+    : undefined;
+
+// Twitter card type
+const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
 
 // Current path for active link detection
 const currentPath = Astro.url.pathname;
@@ -47,6 +74,20 @@ const currentYear = new Date().getFullYear();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta property="og:title" content={title || siteConfig.site.name} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title || siteConfig.site.name} />
+    <meta name="twitter:description" content={pageDescription} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    {siteConfig.features.seo.twitterHandle && (
+      <meta name="twitter:creator" content={siteConfig.features.seo.twitterHandle} />
+    )}
     <slot name="head" />
   </head>
   <body>

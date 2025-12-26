@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { getPublishedRecipes, getRecipeSlug } from '../../lib/recipes';
 import { siteConfig } from '../../config/site';
@@ -8,6 +8,7 @@ import RecipeHero from '../../components/recipes/RecipeHero.astro';
 import IngredientList from '../../components/recipes/IngredientList.astro';
 import StepList from '../../components/recipes/StepList.astro';
 import RelatedRecipes from '../../components/recipes/RelatedRecipes.astro';
+import RecipeJsonLd from '../../components/seo/RecipeJsonLd.astro';
 
 export async function getStaticPaths() {
   const publishedRecipes = await getPublishedRecipes();
@@ -22,26 +23,35 @@ export async function getStaticPaths() {
 }
 
 interface Props {
-  recipe: Awaited<ReturnType<typeof getCollection<'recipes'>>>[number];
+  recipe: CollectionEntry<'recipes'>;
 }
 
 const { recipe } = Astro.props;
 const slug = getRecipeSlug(recipe);
 
 // SEO metadata
-const title = `${recipe.data.title} — ${siteConfig.site.name}`;
+const title = recipe.data.title;
 const description = recipe.data.description;
-const canonicalUrl = `${siteConfig.site.url}/recipes/${slug}`;
+const canonicalPath = `/recipes/${slug}`;
+const ogImage = recipe.data.image;
 ---
 
-<SiteLayout title={title}>
+<SiteLayout
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  ogImage={ogImage}
+>
   <Fragment slot="head">
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalUrl} />
-    <meta property="og:title" content={recipe.data.title} />
-    <meta property="og:description" content={description} />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content={canonicalUrl} />
+    {siteConfig.features.seo.jsonLdRecipe && siteConfig.site.url && (
+      <RecipeJsonLd
+        siteUrl={siteConfig.site.url}
+        slug={slug}
+        recipe={recipe.data}
+        ogImagesEnabled={siteConfig.features.seo.ogImages}
+      />
+    )}
   </Fragment>
 
   <article class="recipe-page">
@@ -63,13 +73,6 @@ const canonicalUrl = `${siteConfig.site.url}/recipes/${slug}`;
 
     <StepList steps={recipe.data.steps} />
 
-    {recipe.body && (
-      <section class="recipe-notes">
-        <GlassCard>
-          <div class="recipe-notes-content" set:html={recipe.body} />
-        </GlassCard>
-      </section>
-    )}
 
     <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />
 

@@ -1,0 +1,70 @@
+---
+/**
+ * RecipeJsonLd - Schema.org Recipe JSON-LD component
+ */
+
+import { minutesToIso8601, formatIngredientForJsonLd } from '../../lib/seo';
+
+interface Props {
+  siteUrl: string;
+  slug: string;
+  recipe: {
+    title: string;
+    description: string;
+    category: string;
+    cuisine: string;
+    servingsDefault: number;
+    prepMinutes: number;
+    cookMinutes: number;
+    ingredients: Array<{
+      amount: number;
+      unit?: string;
+      name: string;
+      note?: string;
+    }>;
+    steps: string[];
+    image?: string;
+  };
+  ogImagesEnabled: boolean;
+}
+
+const { siteUrl, slug, recipe, ogImagesEnabled } = Astro.props;
+
+const recipeUrl = `${siteUrl}/recipes/${slug}`;
+const totalMinutes = recipe.prepMinutes + recipe.cookMinutes;
+
+// Build JSON-LD object
+const jsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Recipe',
+  name: recipe.title,
+  description: recipe.description,
+  url: recipeUrl,
+  recipeCategory: recipe.category,
+  recipeCuisine: recipe.cuisine,
+  recipeYield: `${recipe.servingsDefault} servings`,
+  prepTime: minutesToIso8601(recipe.prepMinutes),
+  cookTime: minutesToIso8601(recipe.cookMinutes),
+  totalTime: minutesToIso8601(totalMinutes),
+  recipeIngredient: recipe.ingredients.map((ing) =>
+    formatIngredientForJsonLd(ing.amount, ing.unit, ing.name, ing.note)
+  ),
+  recipeInstructions: recipe.steps.map((step, index) => ({
+    '@type': 'HowToStep',
+    position: index + 1,
+    text: step,
+  })),
+};
+
+// Add image if available and OG images are enabled
+if (recipe.image && ogImagesEnabled) {
+  // If image is a relative path, make it absolute
+  const imageUrl = recipe.image.startsWith('http')
+    ? recipe.image
+    : `${siteUrl}${recipe.image.startsWith('/') ? '' : '/'}${recipe.image}`;
+  jsonLd.image = imageUrl;
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+

@@ -98,6 +98,9 @@ interface SeoConfig {
   robots: boolean;
   ogImages: boolean;
   jsonLdRecipe: boolean;
+  defaultDescription: string;
+  twitterHandle: string;
+  ogImagePath: string;
 }
 
 interface LegalConfig {
@@ -235,6 +238,9 @@ export const siteConfig: SiteConfig = {
       robots: true,
       ogImages: true,
       jsonLdRecipe: true,
+      defaultDescription: 'Curated recipes for people tired of fluffy food-blog filler. Every recipe is a banger.',
+      twitterHandle: '', // e.g., '@topshelfkitchen'
+      ogImagePath: '/og/default.png', // Can be missing, will be generated later
     },
 
     // Legal compliance
