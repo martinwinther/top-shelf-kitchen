@@ -1,79 +1,97 @@
 ---
 import { getCollection } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import GlassCard from '../../components/ui/GlassCard.astro';
-import Button from '../../components/ui/Button.astro';
-import Badge from '../../components/ui/Badge.astro';
-import Toggle from '../../components/ui/Toggle.astro';
-import Modal from '../../components/ui/Modal.astro';
+import RecipeCard from '../../components/recipes/RecipeCard.astro';
+import { RecipeFilters } from '../../components/react/RecipeFilters';
 
-const recipes = await getCollection('recipes');
+const allRecipes = await getCollection('recipes');
+const publishedRecipes = allRecipes.filter((recipe) => recipe.data.status === 'published');
+
+// Derive categories from schema (known list)
+const categories = ['breakfast', 'lunch', 'dinner', 'dessert', 'snacks'] as const;
+
+// Derive unique cuisines from recipes, sorted
+const cuisines = Array.from(
+  new Set(publishedRecipes.map((recipe) => recipe.data.cuisine))
+).sort();
+
+// Read query params
+const searchParams = Astro.url.searchParams;
+const filterCategory = searchParams.get('category') || '';
+const filterCuisine = searchParams.get('cuisine') || '';
+const sortBy = searchParams.get('sort') || 'newest';
+
+// Filter recipes
+let visibleRecipes = publishedRecipes;
+
+if (filterCategory) {
+  visibleRecipes = visibleRecipes.filter(
+    (recipe) => recipe.data.category === filterCategory
+  );
+}
+
+if (filterCuisine) {
+  visibleRecipes = visibleRecipes.filter(
+    (recipe) => recipe.data.cuisine === filterCuisine
+  );
+}
+
+// Sort recipes
+visibleRecipes = [...visibleRecipes].sort((a, b) => {
+  if (sortBy === 'title') {
+    return a.data.title.localeCompare(b.data.title);
+  }
+  
+  if (sortBy === 'quickest') {
+    const totalA = a.data.times.prepMinutes + a.data.times.cookMinutes;
+    const totalB = b.data.times.prepMinutes + b.data.times.cookMinutes;
+    return totalA - totalB;
+  }
+  
+  // Default: newest (keep current order for now)
+  // TODO: Add publishedAt field to recipe schema for proper date-based sorting
+  return 0;
+});
 ---
 
 <SiteLayout title="Recipes">
   <div class="page-content">
     <header class="page-header">
-      <h1>Recipes ({recipes.length})</h1>
+      <h1>Recipes ({visibleRecipes.length} of {publishedRecipes.length})</h1>
       <p class="subtitle">Only the keepers. No filler.</p>
     </header>
 
-    <section class="recipes-list">
-      <ul>
-        {recipes.map((recipe) => (
-          <li>{recipe.data.title}</li>
-        ))}
-      </ul>
-    </section>
+    <RecipeFilters
+      client:load
+      categories={categories}
+      cuisines={cuisines}
+    />
 
-    <section class="section">
-      <h2 class="demo-title">UI Components</h2>
-      <GlassCard>
-        <div class="demo-content">
-          <div class="demo-group">
-            <h3>Buttons</h3>
-            <div class="demo-buttons">
-              <Button variant="primary" size="sm">Small</Button>
-              <Button variant="secondary" size="md">Medium</Button>
-              <Button variant="ghost" size="lg">Large</Button>
-            </div>
-          </div>
-
-          <div class="demo-group">
-            <h3>Badges</h3>
-            <div class="demo-badges">
-              <Badge tone="accent">Dinner</Badge>
-              <Badge tone="neutral">Dessert</Badge>
-              <Badge tone="muted">Draft</Badge>
-            </div>
-          </div>
-
-          <div class="demo-group">
-            <h3>Toggle</h3>
-            <Toggle id="recipes-toggle" label="Show only favorites" />
-          </div>
-
-          <div class="demo-group">
-            <h3>Modal</h3>
-            <Button variant="primary" data-modal-open="philosophy-modal">
-              Our Philosophy
-            </Button>
-          </div>
+    <section class="recipes-grid">
+      {visibleRecipes.length > 0 ? (
+        visibleRecipes.map((recipe) => {
+          // Derive slug from entry id (filename without .md) or use data.slug if provided
+          const slug = recipe.data.slug || recipe.id.replace(/\.md$/, '');
+          return (
+            <RecipeCard
+              title={recipe.data.title}
+              description={recipe.data.description}
+              href={`/recipes/${slug}`}
+              category={recipe.data.category}
+              cuisine={recipe.data.cuisine}
+              prepMinutes={recipe.data.times.prepMinutes}
+              cookMinutes={recipe.data.times.cookMinutes}
+              servingsDefault={recipe.data.servingsDefault}
+            />
+          );
+        })
+      ) : (
+        <div class="empty-state">
+          <p>No recipes found matching your filters.</p>
         </div>
-      </GlassCard>
+      )}
     </section>
   </div>
-
-  <Modal id="philosophy-modal" title="No Filler. Just Keepers.">
-    <Fragment slot="content">
-      <p>
-        Every recipe on this site has been tested, refined, and chosen because it delivers.
-        No SEO fluff, no life stories—just recipes that work.
-      </p>
-    </Fragment>
-    <Fragment slot="footer">
-      <Button variant="ghost" data-modal-close>Close</Button>
-    </Fragment>
-  </Modal>
 </SiteLayout>
 
 <style>
@@ -93,54 +111,31 @@ const recipes = await getCollection('recipes');
     margin-top: 0.5rem;
   }
 
-  .recipes-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
-  .recipes-list li {
-    padding: 0.5rem 0;
-    color: var(--text);
+  @media (min-width: 640px) {
+    .recipes-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .recipes-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-state p {
     font-size: 1.125rem;
-  }
-
-  .section {
-    margin-top: 2rem;
-  }
-
-  .demo-title {
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 1rem;
-  }
-
-  .demo-content {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .demo-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .demo-group h3 {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--muted);
-    margin: 0;
-  }
-
-  .demo-buttons,
-  .demo-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
   }
 </style>
