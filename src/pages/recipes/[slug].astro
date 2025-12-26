@@ -9,6 +9,7 @@ import IngredientList from '../../components/recipes/IngredientList.astro';
 import StepList from '../../components/recipes/StepList.astro';
 import RelatedRecipes from '../../components/recipes/RelatedRecipes.astro';
 import RecipeJsonLd from '../../components/seo/RecipeJsonLd.astro';
+import { RecipeIngredientsScaler } from '../../components/react/RecipeIngredientsScaler';
 
 export async function getStaticPaths() {
   const publishedRecipes = await getPublishedRecipes();
@@ -69,7 +70,16 @@ const ogImage = recipe.data.image;
       imageAlt={recipe.data.imageAlt}
     />
 
-    <IngredientList ingredients={recipe.data.ingredients} />
+    {siteConfig.features.recipeScaling.enabled ? (
+      <RecipeIngredientsScaler
+        client:load
+        slug={slug}
+        baseServings={recipe.data.servingsDefault}
+        ingredients={recipe.data.ingredients}
+      />
+    ) : (
+      <IngredientList ingredients={recipe.data.ingredients} />
+    )}
 
     <StepList steps={recipe.data.steps} />
 

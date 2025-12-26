@@ -14,8 +14,10 @@ interface Props {
     category: string;
     cuisine: string;
     servingsDefault: number;
-    prepMinutes: number;
-    cookMinutes: number;
+    times: {
+      prepMinutes: number;
+      cookMinutes: number;
+    };
     ingredients: Array<{
       amount: number;
       unit?: string;
@@ -31,7 +33,7 @@ interface Props {
 const { siteUrl, slug, recipe, ogImagesEnabled } = Astro.props;
 
 const recipeUrl = `${siteUrl}/recipes/${slug}`;
-const totalMinutes = recipe.prepMinutes + recipe.cookMinutes;
+const totalMinutes = recipe.times.prepMinutes + recipe.times.cookMinutes;
 
 // Build JSON-LD object
 const jsonLd: Record<string, unknown> = {
@@ -43,8 +45,8 @@ const jsonLd: Record<string, unknown> = {
   recipeCategory: recipe.category,
   recipeCuisine: recipe.cuisine,
   recipeYield: `${recipe.servingsDefault} servings`,
-  prepTime: minutesToIso8601(recipe.prepMinutes),
-  cookTime: minutesToIso8601(recipe.cookMinutes),
+  prepTime: minutesToIso8601(recipe.times.prepMinutes),
+  cookTime: minutesToIso8601(recipe.times.cookMinutes),
   totalTime: minutesToIso8601(totalMinutes),
   recipeIngredient: recipe.ingredients.map((ing) =>
     formatIngredientForJsonLd(ing.amount, ing.unit, ing.name, ing.note)
