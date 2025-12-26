@@ -1,24 +1,203 @@
 ---
 import '../styles/global.css';
+import { siteConfig, shouldShowConsentBanner } from '../config/site';
 
 interface Props {
-  title: string;
+  title?: string;
 }
 
 const { title } = Astro.props;
+const pageTitle = title ? `${title} | ${siteConfig.site.name}` : siteConfig.site.name;
+
+// Feature flags
+const showAds = siteConfig.features.ads.enabled;
+const showSidebarAd = showAds && siteConfig.features.ads.slots.sidebar;
+const showBottomBannerAd = showAds && siteConfig.features.ads.slots.bottomBanner;
+const showAnalytics = siteConfig.features.analytics.enabled;
+const showConsentBanner = shouldShowConsentBanner();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={siteConfig.site.locale}>
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{pageTitle}</title>
   </head>
   <body>
-    <slot />
+    <div class="site-wrapper">
+      <!-- Header -->
+      <header class="site-header">
+        <div class="header-content">
+          <a href="/" class="site-logo">
+            {siteConfig.site.name}
+          </a>
+          <nav class="site-nav">
+            <a href="/">Home</a>
+            <a href="/recipes">Recipes</a>
+            <!-- TODO: About link can be toggleable via features.pages.about if needed -->
+            <a href="/about">About</a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- Main content area with optional sidebar -->
+      <div class="content-wrapper">
+        <main class="main-content">
+          <slot />
+        </main>
+
+        {showSidebarAd && (
+          <!-- Ad placeholder: Sidebar (desktop only) - scripts added when ads fully implemented -->
+          <aside class="sidebar-ad" aria-hidden="true">
+            <div data-ad-slot="sidebar" class="ad-placeholder">
+              <!-- AdSense sidebar slot will be rendered here -->
+            </div>
+          </aside>
+        )}
+      </div>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <p class="footer-tagline">{siteConfig.site.tagline}</p>
+      </footer>
+
+      {showBottomBannerAd && (
+        <!-- Ad placeholder: Bottom banner - scripts added when ads fully implemented -->
+        <div data-ad-slot="bottomBanner" class="bottom-banner-ad ad-placeholder" aria-hidden="true">
+          <!-- AdSense bottom banner slot will be rendered here -->
+        </div>
+      )}
+    </div>
+
+    {showAnalytics && (
+      <!-- Analytics placeholder - scripts added when analytics fully implemented -->
+      <!-- Analytics provider: {siteConfig.features.analytics.provider} -->
+    )}
+
+    {showConsentBanner && (
+      <!-- Consent banner root - UI component added when consent manager implemented -->
+      <div id="consent-root"></div>
+    )}
   </body>
 </html>
 
+<style>
+  .site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+  }
+
+  .site-logo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .site-logo:hover {
+    opacity: 0.8;
+  }
+
+  .site-nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .site-nav a {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .site-nav a:hover {
+    color: var(--text);
+    opacity: 1;
+  }
+
+  .content-wrapper {
+    display: flex;
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .main-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sidebar-ad {
+    display: none;
+    width: 300px;
+    flex-shrink: 0;
+  }
+
+  /* Show sidebar ad only on desktop */
+  @media (min-width: 1024px) {
+    .sidebar-ad {
+      display: block;
+    }
+  }
+
+  .ad-placeholder {
+    background: var(--glass-bg);
+    border: 1px dashed var(--glass-border);
+    border-radius: var(--radius-xl);
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-banner-ad {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    min-height: 90px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .site-footer {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin-top: auto;
+  }
+
+  .footer-tagline {
+    font-style: italic;
+    opacity: 0.7;
+  }
+</style>
