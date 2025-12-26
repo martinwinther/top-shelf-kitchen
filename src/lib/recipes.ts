@@ -32,7 +32,7 @@ export function pickFeatured(
   const recipeMap = new Map<string, RecipeEntry>();
   
   recipes.forEach((recipe) => {
-    const slug = recipe.data.slug || recipe.id.replace(/\.md$/, '');
+    const slug = getRecipeSlug(recipe);
     recipeMap.set(slug, recipe);
   });
 
@@ -45,6 +45,12 @@ export function pickFeatured(
  * Get recipe slug from entry (uses data.slug or derives from id)
  */
 export function getRecipeSlug(recipe: RecipeEntry): string {
-  return recipe.data.slug || recipe.id.replace(/\.md$/, '');
+  if (recipe.data.slug) {
+    return recipe.data.slug;
+  }
+  // Extract filename from id (handles both relative paths and filenames)
+  const id = recipe.id;
+  const filename = id.split('/').pop() || id;
+  return filename.replace(/\.mdx?$/, '');
 }
 

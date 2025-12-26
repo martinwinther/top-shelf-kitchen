@@ -3,9 +3,9 @@ import { getCollection } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import RecipeCard from '../../components/recipes/RecipeCard.astro';
 import { RecipeFilters } from '../../components/react/RecipeFilters';
+import { getPublishedRecipes, getRecipeSlug } from '../../lib/recipes';
 
-const allRecipes = await getCollection('recipes');
-const publishedRecipes = allRecipes.filter((recipe) => recipe.data.status === 'published');
+const publishedRecipes = await getPublishedRecipes();
 
 // Derive categories from schema (known list)
 const categories = ['breakfast', 'lunch', 'dinner', 'dessert', 'snacks'] as const;
@@ -70,8 +70,7 @@ visibleRecipes = [...visibleRecipes].sort((a, b) => {
     <section class="recipes-grid">
       {visibleRecipes.length > 0 ? (
         visibleRecipes.map((recipe) => {
-          // Derive slug from entry id (filename without .md) or use data.slug if provided
-          const slug = recipe.data.slug || recipe.id.replace(/\.md$/, '');
+          const slug = getRecipeSlug(recipe);
           return (
             <RecipeCard
               title={recipe.data.title}

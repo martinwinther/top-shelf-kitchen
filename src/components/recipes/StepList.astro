@@ -1,0 +1,67 @@
+---
+/**
+ * StepList - Numbered list of recipe steps with big readable text
+ */
+
+import GlassCard from '../ui/GlassCard.astro';
+
+interface Props {
+  steps: string[];
+}
+
+const { steps } = Astro.props;
+---
+
+<section class="step-section">
+  <h2 class="section-title">Instructions</h2>
+  <GlassCard>
+    <ol class="step-list">
+      {steps.map((step) => (
+        <li class="step-item">{step}</li>
+      ))}
+    </ol>
+  </GlassCard>
+</section>
+
+<style>
+  .step-section {
+    margin: 2rem 0;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 0 0 1rem 0;
+  }
+
+  .step-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .step-item {
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 1.125rem;
+    padding-left: 0.5rem;
+  }
+
+  .step-item::marker {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .step-item {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+

@@ -1,0 +1,104 @@
+---
+/**
+ * RelatedRecipes - Related recipes section using simple heuristic
+ */
+
+import RecipeCard from './RecipeCard.astro';
+import { getRecipeSlug } from '../../lib/recipes';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  currentSlug: string;
+  recipes: CollectionEntry<'recipes'>[];
+}
+
+const { currentSlug, recipes } = Astro.props;
+
+// Heuristic: prefer same category, then same cuisine, exclude current
+const currentRecipe = recipes.find(
+  (r) => getRecipeSlug(r) === currentSlug
+);
+
+if (!currentRecipe) {
+  return null;
+}
+
+const currentCategory = currentRecipe.data.category;
+const currentCuisine = currentRecipe.data.cuisine;
+
+// Find related recipes
+const related = recipes
+  .filter((r) => getRecipeSlug(r) !== currentSlug)
+  .map((recipe) => {
+    const sameCategory = recipe.data.category === currentCategory;
+    const sameCuisine = recipe.data.cuisine === currentCuisine;
+    
+    // Priority: same category + same cuisine > same category > same cuisine
+    let priority = 0;
+    if (sameCategory && sameCuisine) priority = 3;
+    else if (sameCategory) priority = 2;
+    else if (sameCuisine) priority = 1;
+    
+    return { recipe, priority };
+  })
+  .filter((item) => item.priority > 0)
+  .sort((a, b) => b.priority - a.priority)
+  .slice(0, 3)
+  .map((item) => item.recipe);
+
+if (related.length === 0) {
+  return null;
+}
+---
+
+<section class="related-section">
+  <h2 class="section-title">Related Recipes</h2>
+  <div class="related-grid">
+    {related.map((recipe) => (
+      <RecipeCard
+        title={recipe.data.title}
+        description={recipe.data.description}
+        href={`/recipes/${getRecipeSlug(recipe)}`}
+        category={recipe.data.category}
+        cuisine={recipe.data.cuisine}
+        prepMinutes={recipe.data.times.prepMinutes}
+        cookMinutes={recipe.data.times.cookMinutes}
+        servingsDefault={recipe.data.servingsDefault}
+      />
+    ))}
+  </div>
+</section>
+
+<style>
+  .related-section {
+    margin: 3rem 0 2rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 0 0 1.5rem 0;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
+

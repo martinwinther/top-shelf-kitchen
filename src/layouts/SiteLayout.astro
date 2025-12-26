@@ -47,6 +47,7 @@ const currentYear = new Date().getFullYear();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <slot name="head" />
   </head>
   <body>
     <!-- Skip to content link for accessibility -->

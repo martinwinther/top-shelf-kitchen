@@ -1,0 +1,99 @@
+---
+/**
+ * IngredientList - Clean list of recipe ingredients
+ */
+
+import GlassCard from '../ui/GlassCard.astro';
+
+interface Ingredient {
+  amount: number;
+  unit?: string;
+  name: string;
+  note?: string;
+}
+
+interface Props {
+  ingredients: Ingredient[];
+}
+
+const { ingredients } = Astro.props;
+
+const formatAmount = (amount: number, unit?: string): string => {
+  if (amount === 0) {
+    return unit || '';
+  }
+  const amountStr = amount.toString();
+  return unit ? `${amountStr} ${unit}` : amountStr;
+};
+---
+
+<section class="ingredient-section">
+  <h2 class="section-title">Ingredients</h2>
+  <GlassCard>
+    <ul class="ingredient-list">
+      {ingredients.map((ingredient) => (
+        <li class="ingredient-item">
+          <span class="ingredient-amount">
+            {formatAmount(ingredient.amount, ingredient.unit)}
+          </span>
+          <span class="ingredient-name">{ingredient.name}</span>
+          {ingredient.note && (
+            <span class="ingredient-note">{ingredient.note}</span>
+          )}
+        </li>
+      ))}
+    </ul>
+  </GlassCard>
+</section>
+
+<style>
+  .ingredient-section {
+    margin: 2rem 0;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 0 0 1rem 0;
+  }
+
+  .ingredient-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .ingredient-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 1.125rem;
+  }
+
+  .ingredient-amount {
+    font-weight: 600;
+    color: var(--text);
+    min-width: 80px;
+  }
+
+  .ingredient-name {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .ingredient-note {
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-style: italic;
+  }
+</style>
+

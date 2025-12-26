@@ -1,79 +1,87 @@
 ---
+import { getCollection } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import { getPublishedRecipes, getRecipeSlug } from '../../lib/recipes';
+import { siteConfig } from '../../config/site';
 import GlassCard from '../../components/ui/GlassCard.astro';
-import IconButton from '../../components/ui/IconButton.astro';
+import RecipeHero from '../../components/recipes/RecipeHero.astro';
+import IngredientList from '../../components/recipes/IngredientList.astro';
+import StepList from '../../components/recipes/StepList.astro';
+import RelatedRecipes from '../../components/recipes/RelatedRecipes.astro';
 
-export function getStaticPaths() {
-  // Placeholder - will be replaced with content collection entries
-  return [{ params: { slug: 'test' } }];
+export async function getStaticPaths() {
+  const publishedRecipes = await getPublishedRecipes();
+  
+  return publishedRecipes.map((recipe) => {
+    const slug = getRecipeSlug(recipe);
+    return {
+      params: { slug },
+      props: { recipe },
+    };
+  });
 }
 
-const { slug } = Astro.params;
+interface Props {
+  recipe: Awaited<ReturnType<typeof getCollection<'recipes'>>>[number];
+}
 
-// Placeholder recipe data - will come from content collections
-const recipe = {
-  title: `Sample Recipe: ${slug}`,
-  description: 'This is a placeholder for a real recipe. The full recipe system will include ingredients, steps, scaling, and cooking mode.',
-  prepTime: 15,
-  cookTime: 30,
-  servings: 4,
-};
+const { recipe } = Astro.props;
+const slug = getRecipeSlug(recipe);
+
+// SEO metadata
+const title = `${recipe.data.title} — ${siteConfig.site.name}`;
+const description = recipe.data.description;
+const canonicalUrl = `${siteConfig.site.url}/recipes/${slug}`;
 ---
 
-<SiteLayout title={recipe.title}>
+<SiteLayout title={title}>
+  <Fragment slot="head">
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:title" content={recipe.data.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={canonicalUrl} />
+  </Fragment>
+
   <article class="recipe-page">
-    <header class="recipe-header">
-      <a href="/recipes" class="back-link">← All Recipes</a>
-      <h1>{recipe.title}</h1>
-      <p class="recipe-description">{recipe.description}</p>
-    </header>
+    <a href="/recipes" class="back-link">← All Recipes</a>
 
-    <div class="recipe-meta-bar">
-      <GlassCard>
-        <div class="meta-grid">
-          <div class="meta-item">
-            <span class="meta-label">Prep</span>
-            <span class="meta-value">{recipe.prepTime} min</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Cook</span>
-            <span class="meta-value">{recipe.cookTime} min</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Servings</span>
-            <span class="meta-value">{recipe.servings}</span>
-          </div>
-        </div>
-      </GlassCard>
-    </div>
+    <RecipeHero
+      title={recipe.data.title}
+      description={recipe.data.description}
+      category={recipe.data.category}
+      cuisine={recipe.data.cuisine}
+      prepMinutes={recipe.data.times.prepMinutes}
+      cookMinutes={recipe.data.times.cookMinutes}
+      servingsDefault={recipe.data.servingsDefault}
+      image={recipe.data.image}
+      imageAlt={recipe.data.imageAlt}
+    />
 
-    <div class="recipe-actions">
-      <IconButton label="Print recipe" variant="default">🖨</IconButton>
-      <IconButton label="Share recipe" variant="default">↗</IconButton>
-      <IconButton label="Start cooking mode" variant="default">👨‍🍳</IconButton>
-    </div>
+    <IngredientList ingredients={recipe.data.ingredients} />
 
-    <section class="recipe-section">
-      <h2>Ingredients</h2>
-      <GlassCard>
-        <ul class="ingredients-list">
-          <li>Ingredient placeholder 1</li>
-          <li>Ingredient placeholder 2</li>
-          <li>Ingredient placeholder 3</li>
-        </ul>
-      </GlassCard>
-    </section>
+    <StepList steps={recipe.data.steps} />
 
-    <section class="recipe-section">
-      <h2>Instructions</h2>
-      <GlassCard>
-        <ol class="steps-list">
-          <li>Step 1: This is a placeholder instruction.</li>
-          <li>Step 2: Real recipes will have detailed steps.</li>
-          <li>Step 3: Each step will be navigable in cooking mode.</li>
-        </ol>
-      </GlassCard>
-    </section>
+    {recipe.body && (
+      <section class="recipe-notes">
+        <GlassCard>
+          <div class="recipe-notes-content" set:html={recipe.body} />
+        </GlassCard>
+      </section>
+    )}
+
+    <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />
+
+    <nav class="recipe-navigation">
+      <a href="/recipes" class="nav-link">Browse all recipes</a>
+      <a
+        href={`/recipes?category=${recipe.data.category}`}
+        class="nav-link"
+      >
+        More {recipe.data.category} recipes →
+      </a>
+    </nav>
   </article>
 </SiteLayout>
 
@@ -84,12 +92,7 @@ const recipe = {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  .recipe-header {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    padding-bottom: 3rem;
   }
 
   .back-link {
@@ -97,6 +100,8 @@ const recipe = {
     color: var(--muted);
     text-decoration: none;
     transition: color 0.15s ease;
+    margin-bottom: -1rem;
+    align-self: flex-start;
   }
 
   .back-link:hover {
@@ -104,78 +109,47 @@ const recipe = {
     opacity: 1;
   }
 
-  .recipe-description {
-    color: var(--muted);
+  .recipe-notes {
+    margin: 2rem 0;
+  }
+
+  .recipe-notes-content {
+    color: var(--text);
+    line-height: 1.7;
     font-size: 1.125rem;
-    line-height: 1.6;
   }
 
-  .recipe-meta-bar {
-    width: 100%;
+  .recipe-notes-content :global(p) {
+    margin: 0 0 1rem 0;
   }
 
-  .meta-grid {
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
+  .recipe-notes-content :global(p:last-child) {
+    margin-bottom: 0;
   }
 
-  .meta-item {
+  .recipe-navigation {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--glass-border);
   }
 
-  .meta-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-  }
-
-  .meta-value {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .recipe-actions {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-  }
-
-  .recipe-section h2 {
+  .nav-link {
     font-size: 1rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    margin-bottom: 1rem;
-  }
-
-  .ingredients-list,
-  .steps-list {
-    margin: 0;
-    padding-left: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .ingredients-list li,
-  .steps-list li {
-    color: var(--text);
-    line-height: 1.5;
-  }
-
-  .steps-list li {
-    padding-left: 0.5rem;
-  }
-
-  .steps-list li::marker {
     color: var(--accent);
-    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .nav-link:hover {
+    opacity: 0.8;
+  }
+
+  @media (min-width: 640px) {
+    .recipe-navigation {
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
 </style>
