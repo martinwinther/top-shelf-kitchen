@@ -14,6 +14,10 @@ interface SiteInfo {
   locale: string;
 }
 
+interface ContentConfig {
+  featuredRecipeSlugs: string[];
+}
+
 interface SearchConfig {
   enabled: boolean;
   provider: 'pagefind';
@@ -104,6 +108,7 @@ interface LegalConfig {
 
 interface DevConfig {
   showDrafts: boolean;
+  showUiDemo: boolean;
 }
 
 interface FeaturesConfig {
@@ -124,6 +129,7 @@ interface FeaturesConfig {
 
 export interface SiteConfig {
   site: SiteInfo;
+  content: ContentConfig;
   features: FeaturesConfig;
 }
 
@@ -137,6 +143,16 @@ export const siteConfig: SiteConfig = {
     tagline: 'Only the keepers.',
     url: 'https://example.com', // Update before deploying
     locale: 'en',
+  },
+
+  content: {
+    featuredRecipeSlugs: [
+      'chicken-tinga-tacos',
+      'miso-butter-salmon-charred-broccoli',
+      'dark-chocolate-olive-oil-cake',
+      'tamago-soft-scramble-soy-butter-rice',
+      'roasted-mushrooms-smoked-paprika-lime',
+    ],
   },
 
   features: {
@@ -231,6 +247,7 @@ export const siteConfig: SiteConfig = {
     // Development options
     dev: {
       showDrafts: false,
+      showUiDemo: false,
     },
   },
 };

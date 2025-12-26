@@ -1,0 +1,167 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import GlassCard from '../../components/ui/GlassCard.astro';
+import Button from '../../components/ui/Button.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Toggle from '../../components/ui/Toggle.astro';
+import Modal from '../../components/ui/Modal.astro';
+import { Counter } from '../../components/react/Counter';
+import { siteConfig } from '../../config/site';
+
+// Gate this route behind dev config
+if (!siteConfig.features.dev.showUiDemo) {
+  return Astro.redirect('/');
+}
+---
+
+<SiteLayout title="UI Components Demo">
+  <div class="page-content">
+    <header class="page-header">
+      <h1>UI Components</h1>
+      <p class="subtitle">Development-only component showcase</p>
+    </header>
+
+    <section class="section">
+      <h2 class="demo-title">Buttons</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <h3>Variants</h3>
+            <div class="demo-buttons">
+              <Button variant="primary" size="sm">Small Primary</Button>
+              <Button variant="primary" size="md">Medium Primary</Button>
+              <Button variant="primary" size="lg">Large Primary</Button>
+            </div>
+            <div class="demo-buttons">
+              <Button variant="secondary" size="sm">Small Secondary</Button>
+              <Button variant="secondary" size="md">Medium Secondary</Button>
+              <Button variant="secondary" size="lg">Large Secondary</Button>
+            </div>
+            <div class="demo-buttons">
+              <Button variant="ghost" size="sm">Small Ghost</Button>
+              <Button variant="ghost" size="md">Medium Ghost</Button>
+              <Button variant="ghost" size="lg">Large Ghost</Button>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="demo-title">Badges</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <div class="demo-badges">
+              <Badge tone="accent">Accent</Badge>
+              <Badge tone="neutral">Neutral</Badge>
+              <Badge tone="muted">Muted</Badge>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="demo-title">Toggle</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <Toggle id="demo-toggle" label="Enable feature" />
+          </div>
+        </div>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="demo-title">Modal</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <Button variant="primary" data-modal-open="demo-modal">
+              Open Modal
+            </Button>
+          </div>
+        </div>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="demo-title">React Components</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <Counter client:load />
+          </div>
+        </div>
+      </GlassCard>
+    </section>
+  </div>
+
+  <Modal id="demo-modal" title="Demo Modal">
+    <Fragment slot="content">
+      <p>This is a demo modal component.</p>
+    </Fragment>
+    <Fragment slot="footer">
+      <Button variant="ghost" data-modal-close>Close</Button>
+    </Fragment>
+  </Modal>
+</SiteLayout>
+
+<style>
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .page-header {
+    padding: 1rem 0 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.125rem;
+    margin-top: 0.5rem;
+  }
+
+  .section {
+    margin-top: 2rem;
+  }
+
+  .demo-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .demo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .demo-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .demo-group h3 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .demo-buttons,
+  .demo-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+</style>
+

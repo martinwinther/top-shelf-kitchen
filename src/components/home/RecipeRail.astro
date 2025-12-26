@@ -1,0 +1,139 @@
+---
+/**
+ * RecipeRail - Horizontal scrolling rail of recipe cards
+ */
+
+import RecipeCard from '../recipes/RecipeCard.astro';
+
+interface Props {
+  title: string;
+  recipes: Array<{
+    title: string;
+    description: string;
+    href: string;
+    category: string;
+    cuisine: string;
+    prepMinutes: number;
+    cookMinutes: number;
+    servingsDefault: number;
+  }>;
+  viewAllHref?: string;
+}
+
+const { title, recipes, viewAllHref } = Astro.props;
+---
+
+<section class="recipe-rail">
+  <div class="recipe-rail-header">
+    <h2 class="recipe-rail-title">{title}</h2>
+    {viewAllHref && (
+      <a href={viewAllHref} class="recipe-rail-link">
+        View all →
+      </a>
+    )}
+  </div>
+
+  <div class="recipe-rail-scroll" tabindex="0">
+    <div class="recipe-rail-content">
+      {recipes.map((recipe) => (
+        <div class="recipe-rail-item">
+          <RecipeCard
+            title={recipe.title}
+            description={recipe.description}
+            href={recipe.href}
+            category={recipe.category}
+            cuisine={recipe.cuisine}
+            prepMinutes={recipe.prepMinutes}
+            cookMinutes={recipe.cookMinutes}
+            servingsDefault={recipe.servingsDefault}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .recipe-rail {
+    margin: 2rem 0;
+  }
+
+  .recipe-rail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .recipe-rail-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .recipe-rail-link {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .recipe-rail-link:hover {
+    color: var(--text);
+  }
+
+  .recipe-rail-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+    padding-bottom: 0.5rem;
+  }
+
+  .recipe-rail-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .recipe-rail-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .recipe-rail-scroll::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 3px;
+  }
+
+  .recipe-rail-scroll:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+  }
+
+  .recipe-rail-content {
+    display: flex;
+    gap: 1.5rem;
+    padding-right: 1rem;
+  }
+
+  .recipe-rail-item {
+    flex: 0 0 280px;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .recipe-rail-item {
+      flex: 0 0 320px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .recipe-rail-scroll {
+      scroll-behavior: auto;
+    }
+  }
+</style>
+

@@ -1,0 +1,51 @@
+---
+/**
+ * CategoryTile - Glass tile component for category navigation
+ */
+
+import GlassCard from '../ui/GlassCard.astro';
+
+interface Props {
+  label: string;
+  href: string;
+  count: number;
+}
+
+const { label, href, count } = Astro.props;
+---
+
+<a href={href} class="category-tile-link">
+  <GlassCard hover>
+    <div class="category-tile-content">
+      <h3 class="category-tile-label">{label}</h3>
+      <p class="category-tile-count">{count} recipe{count !== 1 ? 's' : ''}</p>
+    </div>
+  </GlassCard>
+</a>
+
+<style>
+  .category-tile-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .category-tile-content {
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .category-tile-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: var(--text);
+  }
+
+  .category-tile-count {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin: 0;
+  }
+</style>
+

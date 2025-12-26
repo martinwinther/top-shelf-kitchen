@@ -1,55 +1,236 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import GlassCard from '../components/ui/GlassCard.astro';
 import { siteConfig } from '../config/site';
+import { getPublishedRecipes, getTotalMinutes, pickFeatured, getRecipeSlug } from '../lib/recipes';
+import RecipeCard from '../components/recipes/RecipeCard.astro';
+import CategoryTile from '../components/home/CategoryTile.astro';
+import RecipeRail from '../components/home/RecipeRail.astro';
+
+const allRecipes = await getPublishedRecipes();
+
+// Featured recipes
+const featuredRecipes = pickFeatured(allRecipes, siteConfig.content.featuredRecipeSlugs);
+
+// Category counts
+const categories = ['breakfast', 'lunch', 'dinner', 'dessert', 'snacks'] as const;
+const categoryCounts = categories.map((cat) => ({
+  label: cat.charAt(0).toUpperCase() + cat.slice(1),
+  href: `/recipes?category=${cat}`,
+  count: allRecipes.filter((r) => r.data.category === cat).length,
+}));
+
+// Quick recipes (lowest total minutes, top 6)
+const quickRecipes = [...allRecipes]
+  .sort((a, b) => getTotalMinutes(a) - getTotalMinutes(b))
+  .slice(0, 6)
+  .map((recipe) => ({
+    title: recipe.data.title,
+    description: recipe.data.description,
+    href: `/recipes/${getRecipeSlug(recipe)}`,
+    category: recipe.data.category,
+    cuisine: recipe.data.cuisine,
+    prepMinutes: recipe.data.times.prepMinutes,
+    cookMinutes: recipe.data.times.cookMinutes,
+    servingsDefault: recipe.data.servingsDefault,
+  }));
+
+// Latest recipes (top 6 in current order)
+// TODO: Switch to publishedAt field for proper date-based sorting
+const latestRecipes = allRecipes.slice(0, 6).map((recipe) => ({
+  title: recipe.data.title,
+  description: recipe.data.description,
+  href: `/recipes/${getRecipeSlug(recipe)}`,
+  category: recipe.data.category,
+  cuisine: recipe.data.cuisine,
+  prepMinutes: recipe.data.times.prepMinutes,
+  cookMinutes: recipe.data.times.cookMinutes,
+  servingsDefault: recipe.data.servingsDefault,
+}));
 ---
 
 <SiteLayout>
-  <div class="page-content">
-    <header class="page-header">
-      <h1>{siteConfig.site.name}</h1>
-      <p class="tagline">{siteConfig.site.tagline}</p>
+  <div class="home-content">
+    <!-- Hero -->
+    <header class="home-hero">
+      <h1 class="hero-title">{siteConfig.site.name}</h1>
+      <p class="hero-tagline">{siteConfig.site.tagline}</p>
+      <p class="hero-value-prop">
+        A dark, heavy-glass, minimalist recipe site for people tired of fluffy food-blog filler.
+        Every recipe is a banger.
+      </p>
     </header>
 
-    <section class="section">
-      <GlassCard>
-        <p class="intro-text">
-          A dark, heavy-glass, minimalist recipe site for people tired of fluffy food-blog filler.
-          Every recipe is a banger.
-        </p>
-      </GlassCard>
+    <!-- Featured Recipes -->
+    {featuredRecipes.length > 0 && (
+      <section class="home-section">
+        <h2 class="section-title">Featured</h2>
+        <div class="featured-grid">
+          {featuredRecipes.map((recipe) => (
+            <RecipeCard
+              title={recipe.data.title}
+              description={recipe.data.description}
+              href={`/recipes/${getRecipeSlug(recipe)}`}
+              category={recipe.data.category}
+              cuisine={recipe.data.cuisine}
+              prepMinutes={recipe.data.times.prepMinutes}
+              cookMinutes={recipe.data.times.cookMinutes}
+              servingsDefault={recipe.data.servingsDefault}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Category Tiles -->
+    <section class="home-section">
+      <h2 class="section-title">Browse by Category</h2>
+      <div class="category-grid">
+        {categoryCounts.map((category) => (
+          <CategoryTile
+            label={category.label}
+            href={category.href}
+            count={category.count}
+          />
+        ))}
+      </div>
+    </section>
+
+    <!-- Quick Recipes Rail -->
+    {quickRecipes.length > 0 && (
+      <RecipeRail
+        title="Quick"
+        recipes={quickRecipes}
+        viewAllHref="/recipes?sort=quickest"
+      />
+    )}
+
+    <!-- Latest Recipes Rail -->
+    {latestRecipes.length > 0 && (
+      <RecipeRail
+        title="Latest"
+        recipes={latestRecipes}
+        viewAllHref="/recipes"
+      />
+    )}
+
+    <!-- Footer CTA -->
+    <section class="home-section home-cta">
+      <a href="/recipes" class="cta-link">
+        Browse all recipes →
+      </a>
     </section>
   </div>
 </SiteLayout>
 
 <style>
-  .page-content {
+  .home-content {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 3rem;
   }
 
-  .page-header {
+  .home-hero {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: var(--text);
+  }
+
+  .hero-tagline {
+    font-size: 1.5rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .hero-value-prop {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .home-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .featured-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .featured-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .category-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .category-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  .home-cta {
     text-align: center;
     padding: 2rem 0;
   }
 
-  .tagline {
-    color: var(--muted);
-    font-size: 1.25rem;
-    font-style: italic;
-    margin-top: 0.75rem;
-  }
-
-  .section {
-    max-width: 640px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .intro-text {
-    color: var(--text);
+  .cta-link {
+    display: inline-block;
     font-size: 1.125rem;
-    line-height: 1.7;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .cta-link:hover {
+    opacity: 0.8;
+  }
+
+  @media (min-width: 768px) {
+    .hero-title {
+      font-size: 4rem;
+    }
+
+    .hero-tagline {
+      font-size: 1.75rem;
+    }
   }
 </style>
