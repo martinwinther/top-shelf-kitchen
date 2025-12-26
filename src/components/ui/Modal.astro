@@ -1,0 +1,246 @@
+---
+/**
+ * Modal - Accessible dialog component
+ * 
+ * Uses native <dialog> element with minimal JavaScript for open/close.
+ * 
+ * @example
+ * <Modal id="about-modal" title="About">
+ *   <Fragment slot="trigger">
+ *     <Button>Open Modal</Button>
+ *   </Fragment>
+ *   <Fragment slot="content">
+ *     <p>Modal content here</p>
+ *   </Fragment>
+ * </Modal>
+ * 
+ * Or use data attributes:
+ * <button data-modal-open="about-modal">Open</button>
+ * <button data-modal-close>Close</button>
+ */
+
+interface Props {
+  /** Unique ID for the modal (required) */
+  id: string;
+  /** Optional modal title */
+  title?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const { id, title, class: className = '' } = Astro.props;
+const modalId = id;
+---
+
+{/* Trigger slot - optional */}
+<slot name="trigger" />
+
+<dialog id={modalId} class={`modal ${className}`}>
+  <div class="modal-backdrop"></div>
+  <div class="modal-container">
+    <div class="modal-header">
+      {title && <h2 class="modal-title">{title}</h2>}
+      <button
+        type="button"
+        class="modal-close"
+        data-modal-close
+        aria-label="Close dialog"
+      >
+        ×
+      </button>
+    </div>
+    <div class="modal-content">
+      <slot name="content" />
+    </div>
+    <div class="modal-footer">
+      <slot name="footer" />
+    </div>
+  </div>
+</dialog>
+
+<script>
+  (function() {
+    // Get all modals on the page
+    const modals = document.querySelectorAll('dialog.modal');
+    
+    if (modals.length === 0) return;
+    
+    // Open modal handler
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.showModal();
+        // Focus first focusable element in modal
+        const firstFocusable = modal.querySelector(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (firstFocusable) {
+          firstFocusable.focus();
+        }
+      }
+    }
+    
+    // Close modal handler
+    function closeModal(modal) {
+      modal.close();
+    }
+    
+    // Handle open triggers
+    document.addEventListener('click', function(e) {
+      const target = e.target;
+      const openTrigger = target.closest('[data-modal-open]');
+      if (openTrigger) {
+        const modalId = openTrigger.getAttribute('data-modal-open');
+        if (modalId) {
+          e.preventDefault();
+          openModal(modalId);
+        }
+      }
+    });
+    
+    // Handle close triggers
+    document.addEventListener('click', function(e) {
+      const target = e.target;
+      const closeTrigger = target.closest('[data-modal-close]');
+      if (closeTrigger) {
+        const modal = closeTrigger.closest('dialog');
+        if (modal) {
+          e.preventDefault();
+          closeModal(modal);
+        }
+      }
+    });
+    
+    // Handle backdrop clicks
+    modals.forEach(function(modal) {
+      modal.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.classList.contains('modal-backdrop')) {
+          closeModal(modal);
+        }
+      });
+    });
+    
+    // Handle ESC key (native dialog handles this, but ensure it works)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const openModal = document.querySelector('dialog.modal[open]');
+        if (openModal) {
+          closeModal(openModal);
+        }
+      }
+    });
+  })();
+</script>
+
+<style>
+  .modal {
+    margin: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 100%;
+  }
+
+  .modal::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: -1;
+  }
+
+  .modal-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glass-shadow), 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .modal-close {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .modal-close:hover {
+    background: var(--glass-bg);
+    color: var(--text);
+  }
+
+  .modal-close:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  /* Hide footer if empty */
+  .modal-footer:empty {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .modal {
+      max-width: 32rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal-close {
+      transition: none;
+    }
+  }
+</style>
+

@@ -1,0 +1,30 @@
+---
+/**
+ * Badge - Small label component
+ * 
+ * Used for tags, categories, status indicators, etc.
+ * 
+ * @example
+ * <Badge tone="accent">New</Badge>
+ * <Badge tone="neutral">Dinner</Badge>
+ * <Badge tone="muted">Draft</Badge>
+ */
+
+import { badgeClasses, cx } from './classes';
+
+interface Props {
+  /** Visual tone */
+  tone?: 'neutral' | 'accent' | 'muted';
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const { tone = 'neutral', class: className = '' } = Astro.props;
+
+const classes = cx(badgeClasses({ tone }), className);
+---
+
+<span class={classes}>
+  <slot />
+</span>
+

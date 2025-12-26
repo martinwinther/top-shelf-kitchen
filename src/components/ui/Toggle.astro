@@ -1,0 +1,123 @@
+---
+/**
+ * Toggle - Accessible toggle switch
+ * 
+ * Built on native checkbox with custom styling for glass aesthetic.
+ * Fully keyboard accessible with focus-visible support.
+ * 
+ * @example
+ * <Toggle id="notifications" label="Enable notifications" />
+ * <Toggle id="dark-mode" label="Dark mode" checked />
+ */
+
+interface Props {
+  /** Unique ID for the toggle (required for accessibility) */
+  id: string;
+  /** Accessible label text */
+  label: string;
+  /** Checked state */
+  checked?: boolean;
+  /** Form name attribute */
+  name?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const { id, label, checked = false, name, class: className = '' } = Astro.props;
+const toggleId = id;
+const labelId = `${id}-label`;
+---
+
+<div class={`toggle-wrapper ${className}`}>
+  <input
+    type="checkbox"
+    id={toggleId}
+    name={name}
+    checked={checked}
+    class="toggle-input"
+    aria-labelledby={labelId}
+  />
+  <label for={toggleId} id={labelId} class="toggle-label">
+    <span class="toggle-switch"></span>
+    <span class="toggle-text">{label}</span>
+  </label>
+</div>
+
+<style>
+  .toggle-wrapper {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle-switch {
+    position: relative;
+    width: 2.75rem;
+    height: 1.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 9999px;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .toggle-switch::before {
+    content: '';
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: var(--text);
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+
+  .toggle-input:checked + .toggle-label .toggle-switch {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .toggle-input:checked + .toggle-label .toggle-switch::before {
+    transform: translateX(1.25rem);
+  }
+
+  .toggle-input:focus-visible + .toggle-label .toggle-switch {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .toggle-text {
+    color: var(--text);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .toggle-label:hover .toggle-switch {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toggle-switch,
+    .toggle-switch::before {
+      transition: none;
+    }
+  }
+</style>
+

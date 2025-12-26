@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { siteConfig, shouldShowConsentBanner } from '../config/site';
+import Button from '../components/ui/Button.astro';
 
 interface Props {
   title?: string;
@@ -60,13 +61,15 @@ const currentYear = new Date().getFullYear();
           </a>
           <nav class="site-nav" aria-label="Main navigation">
             {navItems.map((item) => (
-              <a
+              <Button
                 href={item.href}
-                class:list={['nav-link', { 'nav-link--active': isActive(item.href) }]}
+                variant="ghost"
+                size="sm"
+                class:list={[{ 'nav-link--active': isActive(item.href) }]}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
                 {item.label}
-              </a>
+              </Button>
             ))}
           </nav>
         </div>
@@ -193,27 +196,10 @@ const currentYear = new Date().getFullYear();
     gap: 0.5rem;
   }
 
-  .nav-link {
-    color: var(--muted);
-    font-size: 0.9rem;
-    text-decoration: none;
-    padding: 0.5rem 0.875rem;
-    border-radius: 0.5rem;
-    transition:
-      color 0.15s ease,
-      background-color 0.15s ease;
-  }
-
-  .nav-link:hover {
-    color: var(--text);
-    background: var(--glass-bg);
-    opacity: 1;
-  }
-
   .nav-link--active {
-    color: var(--text);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    color: var(--text) !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
   }
 
   /* Main content area */

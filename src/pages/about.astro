@@ -1,6 +1,10 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import GlassCard from '../components/ui/GlassCard.astro';
+import Button from '../components/ui/Button.astro';
+import Badge from '../components/ui/Badge.astro';
+import Toggle from '../components/ui/Toggle.astro';
+import Modal from '../components/ui/Modal.astro';
 import { siteConfig } from '../config/site';
 ---
 
@@ -36,7 +40,57 @@ import { siteConfig } from '../config/site';
         </div>
       </GlassCard>
     </section>
+
+    <section class="section">
+      <h2 class="demo-title">UI Components</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <h3>Buttons</h3>
+            <div class="demo-buttons">
+              <Button variant="primary">Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="ghost">Ghost</Button>
+            </div>
+          </div>
+
+          <div class="demo-group">
+            <h3>Badges</h3>
+            <div class="demo-badges">
+              <Badge tone="neutral">Neutral</Badge>
+              <Badge tone="accent">Accent</Badge>
+              <Badge tone="muted">Muted</Badge>
+            </div>
+          </div>
+
+          <div class="demo-group">
+            <h3>Toggle</h3>
+            <Toggle id="demo-toggle" label="Enable notifications" />
+          </div>
+
+          <div class="demo-group">
+            <h3>Modal</h3>
+            <Button variant="primary" data-modal-open="philosophy-modal">
+              View Philosophy
+            </Button>
+          </div>
+        </div>
+      </GlassCard>
+    </section>
   </div>
+
+  <Modal id="philosophy-modal" title="Our Philosophy">
+    <Fragment slot="content">
+      <p>No filler. Just keepers.</p>
+      <p>
+        Every recipe on this site has been tested, refined, and chosen because it delivers.
+        No SEO fluff, no life stories—just recipes that work.
+      </p>
+    </Fragment>
+    <Fragment slot="footer">
+      <Button variant="ghost" data-modal-close>Close</Button>
+    </Fragment>
+  </Modal>
 </SiteLayout>
 
 <style>
@@ -94,5 +148,40 @@ import { siteConfig } from '../config/site';
 
   .philosophy-list strong {
     color: var(--accent);
+  }
+
+  .demo-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .demo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .demo-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .demo-group h3 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .demo-buttons,
+  .demo-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 </style>

@@ -1,0 +1,69 @@
+---
+/**
+ * Button - Heavy glass button component
+ * 
+ * Renders as <a> when href is provided, otherwise <button>.
+ * Uses buttonClasses for consistent styling across Astro and React.
+ * 
+ * @example
+ * <Button href="/recipes">View Recipes</Button>
+ * <Button variant="secondary" size="lg">Click me</Button>
+ * <Button variant="ghost" type="submit">Submit</Button>
+ */
+
+import { buttonClasses, cx } from './classes';
+
+interface Props {
+  /** Optional link destination (renders as <a> if provided) */
+  href?: string;
+  /** Button style variant */
+  variant?: 'primary' | 'secondary' | 'ghost';
+  /** Button size */
+  size?: 'sm' | 'md' | 'lg';
+  /** Additional CSS classes */
+  class?: string;
+  /** Button type (only for button element) */
+  type?: 'button' | 'submit' | 'reset';
+  /** Disabled state */
+  disabled?: boolean;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  class: className = '',
+  type = 'button',
+  disabled = false,
+} = Astro.props;
+
+const isLink = Boolean(href);
+const Element = isLink ? 'a' : 'button';
+
+const classes = cx(buttonClasses({ variant, size }), className);
+
+const elementProps = isLink
+  ? { href, 'aria-disabled': disabled || undefined }
+  : { type, disabled };
+---
+
+<Element class={classes} {...elementProps}>
+  <slot />
+</Element>
+
+<style>
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .button,
+    button,
+    a[class*="button"] {
+      transition: none !important;
+    }
+    .button:active,
+    button:active,
+    a[class*="button"]:active {
+      transform: none !important;
+    }
+  }
+</style>
+

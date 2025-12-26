@@ -1,6 +1,10 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import GlassCard from '../../components/ui/GlassCard.astro';
+import Button from '../../components/ui/Button.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Toggle from '../../components/ui/Toggle.astro';
+import Modal from '../../components/ui/Modal.astro';
 ---
 
 <SiteLayout title="Recipes">
@@ -38,7 +42,56 @@ import GlassCard from '../../components/ui/GlassCard.astro';
         </p>
       </GlassCard>
     </section>
+
+    <section class="section">
+      <h2 class="demo-title">UI Components</h2>
+      <GlassCard>
+        <div class="demo-content">
+          <div class="demo-group">
+            <h3>Buttons</h3>
+            <div class="demo-buttons">
+              <Button variant="primary" size="sm">Small</Button>
+              <Button variant="secondary" size="md">Medium</Button>
+              <Button variant="ghost" size="lg">Large</Button>
+            </div>
+          </div>
+
+          <div class="demo-group">
+            <h3>Badges</h3>
+            <div class="demo-badges">
+              <Badge tone="accent">Dinner</Badge>
+              <Badge tone="neutral">Dessert</Badge>
+              <Badge tone="muted">Draft</Badge>
+            </div>
+          </div>
+
+          <div class="demo-group">
+            <h3>Toggle</h3>
+            <Toggle id="recipes-toggle" label="Show only favorites" />
+          </div>
+
+          <div class="demo-group">
+            <h3>Modal</h3>
+            <Button variant="primary" data-modal-open="philosophy-modal">
+              Our Philosophy
+            </Button>
+          </div>
+        </div>
+      </GlassCard>
+    </section>
   </div>
+
+  <Modal id="philosophy-modal" title="No Filler. Just Keepers.">
+    <Fragment slot="content">
+      <p>
+        Every recipe on this site has been tested, refined, and chosen because it delivers.
+        No SEO fluff, no life stories—just recipes that work.
+      </p>
+    </Fragment>
+    <Fragment slot="footer">
+      <Button variant="ghost" data-modal-close>Close</Button>
+    </Fragment>
+  </Modal>
 </SiteLayout>
 
 <style>
@@ -99,5 +152,44 @@ import GlassCard from '../../components/ui/GlassCard.astro';
     color: var(--muted);
     font-size: 0.9rem;
     line-height: 1.6;
+  }
+
+  .section {
+    margin-top: 2rem;
+  }
+
+  .demo-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .demo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .demo-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .demo-group h3 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .demo-buttons,
+  .demo-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 </style>

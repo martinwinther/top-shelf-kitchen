@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { buttonClasses } from '../ui/classes';
 
 export function Counter() {
   const [count, setCount] = useState(0);
@@ -9,21 +10,13 @@ export function Counter() {
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <button
           onClick={() => setCount(count + 1)}
-          style={{
-            padding: '0.5rem 1rem',
-            fontSize: '1rem',
-            cursor: 'pointer',
-          }}
+          className={buttonClasses({ variant: 'primary', size: 'md' })}
         >
           +1
         </button>
         <button
           onClick={() => setCount(0)}
-          style={{
-            padding: '0.5rem 1rem',
-            fontSize: '1rem',
-            cursor: 'pointer',
-          }}
+          className={buttonClasses({ variant: 'secondary', size: 'md' })}
         >
           Reset
         </button>
