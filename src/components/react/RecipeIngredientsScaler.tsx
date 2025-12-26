@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { buttonClasses } from '../ui/classes';
+import { convertIngredient, formatAmount, type UnitSystem } from '../../lib/units';
 
 interface Ingredient {
   amount: number;
@@ -14,26 +15,14 @@ interface RecipeIngredientsScalerProps {
   ingredients: Ingredient[];
   minServings?: number;
   maxServings?: number;
+  scalingEnabled?: boolean;
+  unitToggleEnabled?: boolean;
+  defaultUnitSystem?: UnitSystem;
 }
 
 /**
- * Formats a number cleanly:
- * - Rounds to max 2 decimals
- * - Strips trailing zeros after decimal point (1.50 → 1.5, 2.00 → 2)
- * - Avoids showing -0
- */
-function formatAmount(amount: number): string {
-  if (amount === 0) return '';
-  const rounded = Math.round(amount * 100) / 100;
-  const formatted = rounded.toString();
-  // Only strip trailing zeros after a decimal point
-  // This handles both "2.00" → "2" and "1.50" → "1.5"
-  return formatted.replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
-}
-
-/**
- * RecipeIngredientsScaler - Interactive ingredient scaling component
- * Allows users to adjust servings and see ingredient amounts scale in real-time
+ * RecipeIngredientsScaler - Interactive ingredient scaling and unit conversion component
+ * Allows users to adjust servings and toggle between metric/US units
  */
 export function RecipeIngredientsScaler({
   slug,
@@ -41,41 +30,68 @@ export function RecipeIngredientsScaler({
   ingredients,
   minServings = 1,
   maxServings = 16,
+  scalingEnabled = true,
+  unitToggleEnabled = false,
+  defaultUnitSystem = 'metric',
 }: RecipeIngredientsScalerProps) {
-  const storageKey = `tsk.servings.${slug}`;
+  const servingsStorageKey = `tsk.servings.${slug}`;
+  const unitsStorageKey = 'tsk.units';
 
   // Initialize with baseServings to match server render (avoid hydration mismatch)
   const [servings, setServings] = useState<number>(baseServings);
+  const [unitSystem, setUnitSystem] = useState<UnitSystem>(defaultUnitSystem);
 
   // Load from localStorage after mount (client-side only)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
     try {
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        const parsed = parseInt(stored, 10);
-        if (!isNaN(parsed) && parsed >= minServings && parsed <= maxServings) {
-          setServings(parsed);
+      // Load servings (per recipe)
+      if (scalingEnabled) {
+        const storedServings = localStorage.getItem(servingsStorageKey);
+        if (storedServings) {
+          const parsed = parseInt(storedServings, 10);
+          if (!isNaN(parsed) && parsed >= minServings && parsed <= maxServings) {
+            setServings(parsed);
+          }
+        }
+      }
+
+      // Load unit system (global)
+      if (unitToggleEnabled) {
+        const storedUnits = localStorage.getItem(unitsStorageKey);
+        if (storedUnits === 'metric' || storedUnits === 'us') {
+          setUnitSystem(storedUnits);
         }
       }
     } catch (error) {
       // localStorage may be unavailable, ignore
     }
-  }, [storageKey, minServings, maxServings]);
+  }, [servingsStorageKey, unitsStorageKey, minServings, maxServings, scalingEnabled, unitToggleEnabled]);
 
   // Persist servings to localStorage when changed
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !scalingEnabled) return;
     
     try {
-      localStorage.setItem(storageKey, servings.toString());
+      localStorage.setItem(servingsStorageKey, servings.toString());
     } catch (error) {
       // localStorage may be unavailable, ignore
     }
-  }, [servings, storageKey]);
+  }, [servings, servingsStorageKey, scalingEnabled]);
 
-  const scaleFactor = servings / baseServings;
+  // Persist unit system to localStorage when changed
+  useEffect(() => {
+    if (typeof window === 'undefined' || !unitToggleEnabled) return;
+    
+    try {
+      localStorage.setItem(unitsStorageKey, unitSystem);
+    } catch (error) {
+      // localStorage may be unavailable, ignore
+    }
+  }, [unitSystem, unitsStorageKey, unitToggleEnabled]);
+
+  const scaleFactor = scalingEnabled ? servings / baseServings : 1;
 
   const handleDecrement = () => {
     setServings((prev) => Math.max(minServings, prev - 1));
@@ -106,57 +122,106 @@ export function RecipeIngredientsScaler({
     }
   };
 
+  const handleUnitSystemChange = (system: UnitSystem) => {
+    setUnitSystem(system);
+  };
+
   return (
     <section className="my-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-medium uppercase tracking-wider text-[color:var(--muted)] m-0">
           Ingredients
         </h2>
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="servings-input"
-            className="text-xs uppercase tracking-wider text-[color:var(--muted)] font-medium"
-          >
-            Servings
-          </label>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handleDecrement}
-              disabled={servings <= minServings}
-              className={buttonClasses({ variant: 'secondary', size: 'sm' })}
-              aria-label="Decrease servings"
-            >
-              −
-            </button>
-            <input
-              id="servings-input"
-              type="number"
-              min={minServings}
-              max={maxServings}
-              value={servings}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              className="w-16 text-center bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-base font-medium px-2 py-1.5 focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_rgba(255,107,53,0.2)] transition-all duration-150"
-            />
-            <button
-              type="button"
-              onClick={handleIncrement}
-              disabled={servings >= maxServings}
-              className={buttonClasses({ variant: 'secondary', size: 'sm' })}
-              aria-label="Increase servings"
-            >
-              +
-            </button>
-          </div>
+        <div className="flex items-center gap-4">
+          {scalingEnabled && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="servings-input"
+                className="text-xs uppercase tracking-wider text-[color:var(--muted)] font-medium"
+              >
+                Servings
+              </label>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleDecrement}
+                  disabled={servings <= minServings}
+                  className={buttonClasses({ variant: 'secondary', size: 'sm' })}
+                  aria-label="Decrease servings"
+                >
+                  −
+                </button>
+                <input
+                  id="servings-input"
+                  type="number"
+                  min={minServings}
+                  max={maxServings}
+                  value={servings}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
+                  className="w-16 text-center bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-base font-medium px-2 py-1.5 focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_rgba(255,107,53,0.2)] transition-all duration-150"
+                />
+                <button
+                  type="button"
+                  onClick={handleIncrement}
+                  disabled={servings >= maxServings}
+                  className={buttonClasses({ variant: 'secondary', size: 'sm' })}
+                  aria-label="Increase servings"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+          {unitToggleEnabled && (
+            <div className="flex items-center gap-1 bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg p-0.5">
+              <button
+                type="button"
+                onClick={() => handleUnitSystemChange('metric')}
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium transition-all duration-150 rounded-md ${
+                  unitSystem === 'metric'
+                    ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
+                    : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
+                }`}
+                aria-label="Use metric units"
+              >
+                Metric
+              </button>
+              <button
+                type="button"
+                onClick={() => handleUnitSystemChange('us')}
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium transition-all duration-150 rounded-md ${
+                  unitSystem === 'us'
+                    ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
+                    : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
+                }`}
+                aria-label="Use US units"
+              >
+                US
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-xl p-6 backdrop-blur-sm">
         <ul className="list-none m-0 p-0 flex flex-col gap-3">
           {ingredients.map((ingredient, index) => {
-            const scaledAmount = ingredient.amount * scaleFactor;
-            const formattedAmount = formatAmount(scaledAmount);
+            // Step 1: Apply scaling if enabled
+            let amount = ingredient.amount * scaleFactor;
+            let unit = ingredient.unit;
+
+            // Step 2: Apply unit conversion if enabled and unit is convertible
+            if (unitToggleEnabled && unit && amount !== 0) {
+              const converted = convertIngredient(amount, unit, unitSystem);
+              if (converted) {
+                amount = converted.amount;
+                unit = converted.unit;
+              }
+            }
+
+            // Step 3: Format amount
+            const formattedAmount = formatAmount(amount);
 
             return (
               <li key={index} className="flex flex-wrap items-baseline gap-2 text-[color:var(--text)] leading-relaxed text-lg">
@@ -165,7 +230,7 @@ export function RecipeIngredientsScaler({
                 ) : (
                   <span className="font-semibold text-[color:var(--text)] min-w-[80px]">
                     {formattedAmount}
-                    {ingredient.unit && ` ${ingredient.unit}`}
+                    {unit && ` ${unit}`}
                   </span>
                 )}
                 <span className="flex-1 min-w-[200px]">{ingredient.name}</span>

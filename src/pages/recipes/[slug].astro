@@ -70,12 +70,15 @@ const ogImage = recipe.data.image;
       imageAlt={recipe.data.imageAlt}
     />
 
-    {siteConfig.features.recipeScaling.enabled ? (
+    {siteConfig.features.recipeScaling.enabled || siteConfig.features.unitToggle.enabled ? (
       <RecipeIngredientsScaler
         client:load
         slug={slug}
         baseServings={recipe.data.servingsDefault}
         ingredients={recipe.data.ingredients}
+        scalingEnabled={siteConfig.features.recipeScaling.enabled}
+        unitToggleEnabled={siteConfig.features.unitToggle.enabled}
+        defaultUnitSystem={siteConfig.features.unitToggle.default}
       />
     ) : (
       <IngredientList ingredients={recipe.data.ingredients} />
