@@ -1,4 +1,6 @@
 ---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
 export function getStaticPaths() {
   return [{ params: { slug: 'test' } }];
 }
@@ -6,19 +8,16 @@ export function getStaticPaths() {
 const { slug } = Astro.params;
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Recipe: {slug} - Top Shelf Kitchen</title>
-  </head>
-  <body>
-    <h1>Recipe: {slug}</h1>
-    <p>This is a placeholder for the recipe detail page. The slug is: <strong>{slug}</strong></p>
-    <nav>
-      <a href="/recipes">← All Recipes</a> | <a href="/">Home</a>
+<SiteLayout title={`Recipe: ${slug} - Top Shelf Kitchen`}>
+  <main class="min-h-screen p-8 max-w-4xl mx-auto">
+    <h1 class="mb-4">Recipe: {slug}</h1>
+    <p class="text-[color:var(--muted)] mb-8">
+      This is a placeholder for the recipe detail page. The slug is: <strong class="text-[color:var(--text)]">{slug}</strong>
+    </p>
+    <nav class="flex gap-4">
+      <a href="/recipes">← All Recipes</a>
+      <span class="text-[color:var(--muted)]">|</span>
+      <a href="/">Home</a>
     </nav>
-  </body>
-</html>
+  </main>
+</SiteLayout>
