@@ -1,0 +1,117 @@
+---
+/**
+ * IconButton - Small icon action button
+ * 
+ * Renders as <a> when href is provided, otherwise <button>.
+ * Designed for icon-only actions with accessible labels.
+ * 
+ * @example
+ * <IconButton label="Share recipe" variant="default">🔗</IconButton>
+ * <IconButton label="Go home" href="/" variant="ghost">←</IconButton>
+ */
+
+interface Props {
+  /** Accessible label (required for a11y) */
+  label: string;
+  /** Optional link destination (renders as <a> if provided) */
+  href?: string;
+  /** Button style variant */
+  variant?: 'default' | 'ghost';
+  /** Additional CSS classes */
+  class?: string;
+  /** Button type (only for button element) */
+  type?: 'button' | 'submit' | 'reset';
+}
+
+const {
+  label,
+  href,
+  variant = 'default',
+  class: className = '',
+  type = 'button',
+} = Astro.props;
+
+const isLink = Boolean(href);
+const Element = isLink ? 'a' : 'button';
+
+const baseClasses = [
+  'icon-button',
+  `icon-button--${variant}`,
+  className,
+].filter(Boolean).join(' ');
+
+const elementProps = isLink
+  ? { href }
+  : { type };
+---
+
+<Element class={baseClasses} aria-label={label} title={label} {...elementProps}>
+  <slot />
+</Element>
+
+<style>
+  .icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      transform 0.15s ease,
+      opacity 0.15s ease;
+    text-decoration: none;
+    border: none;
+    color: var(--text);
+  }
+
+  /* Default variant - glass background */
+  .icon-button--default {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+
+  .icon-button--default:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+
+  .icon-button--default:active {
+    transform: scale(0.95);
+  }
+
+  /* Ghost variant - transparent until hover */
+  .icon-button--ghost {
+    background: transparent;
+  }
+
+  .icon-button--ghost:hover {
+    background: var(--glass-bg);
+    opacity: 1;
+  }
+
+  .icon-button--ghost:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Focus styles */
+  .icon-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .icon-button {
+      transition: none;
+    }
+    .icon-button--default:hover,
+    .icon-button--default:active {
+      transform: none;
+    }
+  }
+</style>
+

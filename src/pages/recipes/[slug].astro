@@ -1,23 +1,181 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import GlassCard from '../../components/ui/GlassCard.astro';
+import IconButton from '../../components/ui/IconButton.astro';
 
 export function getStaticPaths() {
+  // Placeholder - will be replaced with content collection entries
   return [{ params: { slug: 'test' } }];
 }
 
 const { slug } = Astro.params;
+
+// Placeholder recipe data - will come from content collections
+const recipe = {
+  title: `Sample Recipe: ${slug}`,
+  description: 'This is a placeholder for a real recipe. The full recipe system will include ingredients, steps, scaling, and cooking mode.',
+  prepTime: 15,
+  cookTime: 30,
+  servings: 4,
+};
 ---
 
-<SiteLayout title={`Recipe: ${slug} - Top Shelf Kitchen`}>
-  <main class="min-h-screen p-8 max-w-4xl mx-auto">
-    <h1 class="mb-4">Recipe: {slug}</h1>
-    <p class="text-[color:var(--muted)] mb-8">
-      This is a placeholder for the recipe detail page. The slug is: <strong class="text-[color:var(--text)]">{slug}</strong>
-    </p>
-    <nav class="flex gap-4">
-      <a href="/recipes">← All Recipes</a>
-      <span class="text-[color:var(--muted)]">|</span>
-      <a href="/">Home</a>
-    </nav>
-  </main>
+<SiteLayout title={recipe.title}>
+  <article class="recipe-page">
+    <header class="recipe-header">
+      <a href="/recipes" class="back-link">← All Recipes</a>
+      <h1>{recipe.title}</h1>
+      <p class="recipe-description">{recipe.description}</p>
+    </header>
+
+    <div class="recipe-meta-bar">
+      <GlassCard>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Prep</span>
+            <span class="meta-value">{recipe.prepTime} min</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Cook</span>
+            <span class="meta-value">{recipe.cookTime} min</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Servings</span>
+            <span class="meta-value">{recipe.servings}</span>
+          </div>
+        </div>
+      </GlassCard>
+    </div>
+
+    <div class="recipe-actions">
+      <IconButton label="Print recipe" variant="default">🖨</IconButton>
+      <IconButton label="Share recipe" variant="default">↗</IconButton>
+      <IconButton label="Start cooking mode" variant="default">👨‍🍳</IconButton>
+    </div>
+
+    <section class="recipe-section">
+      <h2>Ingredients</h2>
+      <GlassCard>
+        <ul class="ingredients-list">
+          <li>Ingredient placeholder 1</li>
+          <li>Ingredient placeholder 2</li>
+          <li>Ingredient placeholder 3</li>
+        </ul>
+      </GlassCard>
+    </section>
+
+    <section class="recipe-section">
+      <h2>Instructions</h2>
+      <GlassCard>
+        <ol class="steps-list">
+          <li>Step 1: This is a placeholder instruction.</li>
+          <li>Step 2: Real recipes will have detailed steps.</li>
+          <li>Step 3: Each step will be navigable in cooking mode.</li>
+        </ol>
+      </GlassCard>
+    </section>
+  </article>
 </SiteLayout>
+
+<style>
+  .recipe-page {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .recipe-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .back-link {
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .back-link:hover {
+    color: var(--text);
+    opacity: 1;
+  }
+
+  .recipe-description {
+    color: var(--muted);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .recipe-meta-bar {
+    width: 100%;
+  }
+
+  .meta-grid {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .meta-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .meta-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .recipe-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .recipe-section h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .ingredients-list,
+  .steps-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .ingredients-list li,
+  .steps-list li {
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .steps-list li {
+    padding-left: 0.5rem;
+  }
+
+  .steps-list li::marker {
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>

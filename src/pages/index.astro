@@ -1,23 +1,72 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
+import GlassCard from '../components/ui/GlassCard.astro';
 import { Counter } from '../components/react/Counter';
+import { siteConfig } from '../config/site';
 ---
 
 <SiteLayout>
-  <main class="min-h-screen p-8 max-w-4xl mx-auto">
-    <h1 class="mb-4">Top Shelf Kitchen</h1>
-    <p class="text-[color:var(--muted)] mb-12 text-lg">
-      A dark, heavy-glass, minimalist recipe site for people tired of fluffy food-blog filler.
-    </p>
+  <div class="page-content">
+    <header class="page-header">
+      <h1>{siteConfig.site.name}</h1>
+      <p class="tagline">{siteConfig.site.tagline}</p>
+    </header>
 
-    <section>
-      <h2 class="mb-6">React Island Demo</h2>
-      <!-- Glass card container -->
-      <div
-        class="bg-[color:var(--glass-bg)] backdrop-blur-xl border border-[color:var(--glass-border)] shadow-[var(--glass-shadow)] rounded-[var(--radius-xl)] p-6 inline-block"
-      >
-        <Counter client:load />
-      </div>
+    <section class="section">
+      <GlassCard>
+        <p class="intro-text">
+          A dark, heavy-glass, minimalist recipe site for people tired of fluffy food-blog filler.
+          Every recipe is a banger.
+        </p>
+      </GlassCard>
     </section>
-  </main>
+
+    <section class="section">
+      <h2 class="section-title">React Island Demo</h2>
+      <GlassCard hover>
+        <Counter client:load />
+      </GlassCard>
+    </section>
+  </div>
 </SiteLayout>
+
+<style>
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .page-header {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 1.25rem;
+    font-style: italic;
+    margin-top: 0.75rem;
+  }
+
+  .section {
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .section-title {
+    margin-bottom: 1rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .intro-text {
+    color: var(--text);
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+</style>
