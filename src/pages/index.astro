@@ -1,5 +1,5 @@
 ---
-
+import { Counter } from '../components/react/Counter';
 ---
 
 <html lang="en">
@@ -8,9 +8,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
+    <title>Top Shelf Kitchen</title>
   </head>
   <body>
-    <h1>Astro</h1>
+    <h1>Top Shelf Kitchen</h1>
+    <p>A dark, heavy-glass, minimalist recipe site for people tired of fluffy food-blog filler.</p>
+
+    <h2>React Island Demo</h2>
+    <Counter client:load />
   </body>
 </html>

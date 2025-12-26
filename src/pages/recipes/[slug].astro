@@ -1,0 +1,24 @@
+---
+export function getStaticPaths() {
+  return [{ params: { slug: 'test' } }];
+}
+
+const { slug } = Astro.params;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Recipe: {slug} - Top Shelf Kitchen</title>
+  </head>
+  <body>
+    <h1>Recipe: {slug}</h1>
+    <p>This is a placeholder for the recipe detail page. The slug is: <strong>{slug}</strong></p>
+    <nav>
+      <a href="/recipes">← All Recipes</a> | <a href="/">Home</a>
+    </nav>
+  </body>
+</html>
