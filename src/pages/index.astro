@@ -1,7 +1,6 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import GlassCard from '../components/ui/GlassCard.astro';
-import { Counter } from '../components/react/Counter';
 import { siteConfig } from '../config/site';
 ---
 
@@ -18,13 +17,6 @@ import { siteConfig } from '../config/site';
           A dark, heavy-glass, minimalist recipe site for people tired of fluffy food-blog filler.
           Every recipe is a banger.
         </p>
-      </GlassCard>
-    </section>
-
-    <section class="section">
-      <h2 class="section-title">React Island Demo</h2>
-      <GlassCard hover>
-        <Counter client:load />
       </GlassCard>
     </section>
   </div>
@@ -53,15 +45,6 @@ import { siteConfig } from '../config/site';
     max-width: 640px;
     margin: 0 auto;
     width: 100%;
-  }
-
-  .section-title {
-    margin-bottom: 1rem;
-    color: var(--muted);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
   }
 
   .intro-text {
