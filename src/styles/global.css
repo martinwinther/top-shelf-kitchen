@@ -165,3 +165,256 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================================================
+   Print Styles
+   Minimalist, ink-friendly recipe printouts
+   ========================================================================== */
+
+/* Hide from screen, show only in print */
+.print-only {
+  display: none !important;
+}
+
+/* Hide from print */
+@media print {
+  /* Reset to clean white background */
+  :root {
+    --bg: #ffffff;
+    --text: #000000;
+    --muted: #555555;
+    --accent: #000000;
+    --glass-bg: transparent;
+    --glass-border: #cccccc;
+    --glass-shadow: none;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background: white !important;
+    background-image: none !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove noise overlay */
+  body::before {
+    display: none !important;
+  }
+
+  /* Hide non-essential elements */
+  .no-print,
+  .site-header,
+  .site-footer,
+  .sidebar-ad,
+  .bottom-banner-ad,
+  .ad-placeholder,
+  .cooking-mode-entry,
+  .back-link,
+  .recipe-navigation,
+  .skip-link,
+  #consent-root {
+    display: none !important;
+  }
+
+  /* Reset wrapper layout */
+  .site-wrapper {
+    display: block;
+    min-height: auto;
+  }
+
+  .content-wrapper {
+    display: block;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .main-content {
+    padding: 0;
+  }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Remove glass effects */
+  [class*="glass"],
+  [class*="Glass"] {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Typography for print */
+  h1 {
+    font-size: 24pt;
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-size: 14pt;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.25rem;
+  }
+
+  h3 {
+    font-size: 12pt;
+  }
+
+  /* Recipe page print layout */
+  .recipe-page {
+    max-width: none;
+    padding: 0;
+    gap: 0.5rem;
+  }
+
+  /* Recipe hero print styles */
+  .recipe-hero {
+    margin-bottom: 1rem;
+  }
+
+  .recipe-hero-image {
+    max-width: 300px;
+    margin-bottom: 1rem;
+  }
+
+  .recipe-hero-image img {
+    max-height: 200px;
+    object-fit: cover;
+  }
+
+  .recipe-hero-title {
+    font-size: 24pt !important;
+    color: black !important;
+  }
+
+  .recipe-hero-description {
+    font-size: 11pt;
+    color: #333 !important;
+  }
+
+  .recipe-hero-badges {
+    display: none;
+  }
+
+  /* Meta info inline for print */
+  .recipe-hero-meta {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    margin-top: 0.5rem;
+  }
+
+  .meta-item {
+    flex: 0 0 auto;
+    min-width: auto;
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+
+  .meta-label {
+    font-size: 9pt;
+    color: #666 !important;
+  }
+
+  .meta-value {
+    font-size: 10pt;
+    color: black !important;
+  }
+
+  /* Ingredient list print styles */
+  .ingredient-section {
+    margin: 1rem 0;
+    page-break-inside: avoid;
+  }
+
+  .section-title {
+    font-size: 12pt;
+    color: black !important;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ingredient-list {
+    gap: 0.25rem;
+  }
+
+  .ingredient-item {
+    font-size: 10pt;
+    line-height: 1.4;
+    color: black !important;
+  }
+
+  .ingredient-amount {
+    color: black !important;
+    min-width: 60px;
+  }
+
+  .ingredient-name {
+    color: black !important;
+  }
+
+  .ingredient-note {
+    color: #555 !important;
+    font-size: 9pt;
+  }
+
+  /* Step list print styles */
+  .step-section {
+    margin: 1rem 0;
+  }
+
+  .step-list {
+    gap: 0.75rem;
+  }
+
+  .step-item {
+    font-size: 10pt;
+    line-height: 1.5;
+    color: black !important;
+    page-break-inside: avoid;
+  }
+
+  .step-item::marker {
+    color: black !important;
+    font-size: 10pt;
+  }
+
+  /* Links in print */
+  a {
+    color: black !important;
+    text-decoration: none;
+  }
+
+  /* Hide related recipes in print */
+  .related-recipes {
+    display: none !important;
+  }
+
+  /* Page breaks */
+  .step-section {
+    page-break-before: auto;
+  }
+
+  /* Avoid orphans */
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+}

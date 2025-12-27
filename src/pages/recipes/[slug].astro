@@ -9,6 +9,7 @@ import IngredientList from '../../components/recipes/IngredientList.astro';
 import StepList from '../../components/recipes/StepList.astro';
 import RelatedRecipes from '../../components/recipes/RelatedRecipes.astro';
 import RecipeJsonLd from '../../components/seo/RecipeJsonLd.astro';
+import PrintButton from '../../components/recipes/PrintButton.astro';
 import { RecipeIngredientsScaler } from '../../components/react/RecipeIngredientsScaler';
 import { CookingMode } from '../../components/react/CookingMode';
 
@@ -71,8 +72,8 @@ const ogImage = recipe.data.image;
       imageAlt={recipe.data.imageAlt}
     />
 
-    {siteConfig.features.cookingMode.enabled && (
-      <div class="cooking-mode-entry">
+    <div class="recipe-actions no-print">
+      {siteConfig.features.cookingMode.enabled && (
         <CookingMode
           client:load
           slug={slug}
@@ -85,27 +86,38 @@ const ogImage = recipe.data.image;
           baseServings={recipe.data.servingsDefault}
           features={{ keepAwake: siteConfig.features.cookingMode.keepAwake }}
         />
-      </div>
-    )}
+      )}
+      <PrintButton />
+    </div>
 
     {siteConfig.features.recipeScaling.enabled || siteConfig.features.unitToggle.enabled ? (
-      <RecipeIngredientsScaler
-        client:load
-        slug={slug}
-        baseServings={recipe.data.servingsDefault}
-        ingredients={recipe.data.ingredients}
-        scalingEnabled={siteConfig.features.recipeScaling.enabled}
-        unitToggleEnabled={siteConfig.features.unitToggle.enabled}
-        defaultUnitSystem={siteConfig.features.unitToggle.default}
-      />
+      <>
+        {/* Interactive scaler - hidden in print */}
+        <div class="no-print">
+          <RecipeIngredientsScaler
+            client:load
+            slug={slug}
+            baseServings={recipe.data.servingsDefault}
+            ingredients={recipe.data.ingredients}
+            scalingEnabled={siteConfig.features.recipeScaling.enabled}
+            unitToggleEnabled={siteConfig.features.unitToggle.enabled}
+            defaultUnitSystem={siteConfig.features.unitToggle.default}
+          />
+        </div>
+        {/* Static ingredient list - print only */}
+        <div class="print-only">
+          <IngredientList ingredients={recipe.data.ingredients} />
+        </div>
+      </>
     ) : (
       <IngredientList ingredients={recipe.data.ingredients} />
     )}
 
     <StepList steps={recipe.data.steps} />
 
-
-    <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />
+    <div class="no-print">
+      <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />
+    </div>
 
     <nav class="recipe-navigation">
       <a href="/recipes" class="nav-link">Browse all recipes</a>
@@ -141,6 +153,13 @@ const ogImage = recipe.data.image;
   .back-link:hover {
     color: var(--text);
     opacity: 1;
+  }
+
+  .recipe-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
   }
 
   .recipe-notes {
