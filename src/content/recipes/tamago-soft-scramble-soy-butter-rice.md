@@ -49,3 +49,4 @@ status: "published"
 
 The key is low heat and constant stirring. Remove from heat just before eggs look fully set—they'll finish cooking from residual heat.
 
+
