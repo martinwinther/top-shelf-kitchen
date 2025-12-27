@@ -44,6 +44,7 @@ interface PrintConfig {
 
 interface ShareConfig {
   enabled: boolean;
+  socialLinks?: boolean;
 }
 
 interface AdsenseConfig {
@@ -186,6 +187,7 @@ export const siteConfig: SiteConfig = {
 
     share: {
       enabled: true,
+      socialLinks: false,
     },
 
     // Monetization & engagement (disabled by default for template)

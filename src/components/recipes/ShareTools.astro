@@ -1,0 +1,267 @@
+---
+/**
+ * ShareTools - Minimalist share toolset for recipe pages
+ * 
+ * Features:
+ * - Copy link button with success feedback
+ * - Native share (Web Share API) when supported
+ * - Optional social links (no trackers, plain URLs)
+ * 
+ * Only renders when share feature is enabled in siteConfig.
+ */
+
+import Button from '../ui/Button.astro';
+import { siteConfig } from '../../config/site';
+
+interface Props {
+  title: string;
+  canonicalUrl: string;
+  compact?: boolean;
+}
+
+const { title, canonicalUrl, compact = false } = Astro.props;
+const isShareEnabled = siteConfig.features.share.enabled;
+const showSocialLinks = siteConfig.features.share.socialLinks ?? false;
+
+if (!isShareEnabled) {
+  return null;
+}
+
+// Encode title and URL for social sharing
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(canonicalUrl);
+
+// Social share URLs (plain, no trackers)
+const socialUrls = {
+  twitter: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+  whatsapp: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
+};
+---
+
+{isShareEnabled && (
+  <div class="share-tools no-print">
+    <Button
+      type="button"
+      variant="secondary"
+      size="sm"
+      class="share-button copy-link-button"
+      aria-label="Copy recipe link"
+      data-url={canonicalUrl}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+      <span class="copy-link-text">Copy link</span>
+    </Button>
+
+    <Button
+      type="button"
+      variant="secondary"
+      size="sm"
+      class="share-button native-share-button"
+      aria-label="Share recipe"
+      data-title={title}
+      data-url={canonicalUrl}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+      <span>Share</span>
+    </Button>
+
+    {showSocialLinks && (
+      <div class="social-links">
+        <a
+          href={socialUrls.twitter}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          aria-label="Share on X (Twitter)"
+        >
+          X
+        </a>
+        <a
+          href={socialUrls.facebook}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          aria-label="Share on Facebook"
+        >
+          Facebook
+        </a>
+        <a
+          href={socialUrls.whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          aria-label="Share on WhatsApp"
+        >
+          WhatsApp
+        </a>
+      </div>
+    )}
+
+    <div class="sr-only" aria-live="polite" id="share-feedback"></div>
+  </div>
+)}
+
+<script>
+  (function initShareTools() {
+    const copyButton = document.querySelector('.copy-link-button');
+    const nativeShareButton = document.querySelector('.native-share-button');
+    const feedbackEl = document.getElementById('share-feedback');
+    const copyTextEl = copyButton?.querySelector('.copy-link-text');
+
+    // Show native share button if supported
+    if (nativeShareButton && 'share' in navigator) {
+      nativeShareButton.classList.add('is-visible');
+    }
+
+    // Copy link handler
+    copyButton?.addEventListener('click', async () => {
+      const url = copyButton.getAttribute('data-url');
+      if (!url) return;
+
+      try {
+        // Try modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          // Fallback for older browsers
+          const textarea = document.createElement('textarea');
+          textarea.value = url;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          textarea.style.pointerEvents = 'none';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+        }
+
+        // Show success feedback
+        if (copyTextEl) {
+          const originalText = copyTextEl.textContent;
+          copyTextEl.textContent = 'Copied';
+          if (feedbackEl) {
+            feedbackEl.textContent = 'Link copied to clipboard';
+          }
+          setTimeout(() => {
+            copyTextEl.textContent = originalText;
+            if (feedbackEl) {
+              feedbackEl.textContent = '';
+            }
+          }, 1500);
+        }
+      } catch (err) {
+        // Silently handle errors (e.g., user denied clipboard permission)
+        console.error('Failed to copy link:', err);
+      }
+    });
+
+    // Native share handler
+    nativeShareButton?.addEventListener('click', async () => {
+      const title = nativeShareButton.getAttribute('data-title') || '';
+      const url = nativeShareButton.getAttribute('data-url') || '';
+
+      try {
+        await navigator.share({
+          title,
+          url,
+        });
+      } catch (err) {
+        // Silently handle errors (user cancelled is common)
+        if (err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+        }
+      }
+    });
+  })();
+</script>
+
+<style>
+  .share-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .share-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .share-button svg {
+    flex-shrink: 0;
+  }
+
+  .native-share-button {
+    display: none;
+  }
+
+  .native-share-button.is-visible {
+    display: inline-flex;
+  }
+
+  .social-links {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: 0.25rem;
+  }
+
+  .social-link {
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .social-link:hover {
+    color: var(--text);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
+

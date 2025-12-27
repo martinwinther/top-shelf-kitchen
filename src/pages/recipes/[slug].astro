@@ -10,6 +10,7 @@ import StepList from '../../components/recipes/StepList.astro';
 import RelatedRecipes from '../../components/recipes/RelatedRecipes.astro';
 import RecipeJsonLd from '../../components/seo/RecipeJsonLd.astro';
 import PrintButton from '../../components/recipes/PrintButton.astro';
+import ShareTools from '../../components/recipes/ShareTools.astro';
 import { RecipeIngredientsScaler } from '../../components/react/RecipeIngredientsScaler';
 import { CookingMode } from '../../components/react/CookingMode';
 
@@ -36,6 +37,7 @@ const slug = getRecipeSlug(recipe);
 const title = recipe.data.title;
 const description = recipe.data.description;
 const canonicalPath = `/recipes/${slug}`;
+const canonicalUrl = `${siteConfig.site.url}${canonicalPath}`;
 const ogImage = recipe.data.image;
 ---
 
@@ -88,6 +90,7 @@ const ogImage = recipe.data.image;
         />
       )}
       <PrintButton />
+      <ShareTools title={title} canonicalUrl={canonicalUrl} />
     </div>
 
     {siteConfig.features.recipeScaling.enabled || siteConfig.features.unitToggle.enabled ? (
