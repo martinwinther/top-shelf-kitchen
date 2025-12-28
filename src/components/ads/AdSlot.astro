@@ -1,10 +1,13 @@
 ---
 /**
  * AdSlot - Reusable AdSense ad slot component
- * 
+ *
  * Renders an AdSense <ins> element with proper configuration.
- * In dev mode with missing config, shows a placeholder.
- * In prod with missing config, renders nothing.
+ * Only pushes ad request if user has given consent.
+ *
+ * In dev mode with missing config: shows placeholder.
+ * In dev mode with no consent: shows "Ads disabled (no consent)" placeholder.
+ * In prod with no consent or missing config: renders nothing.
  */
 
 import { siteConfig } from '../../config/site';
@@ -34,20 +37,17 @@ const {
   label = 'Ad slot',
 } = Astro.props;
 
-const { ads } = siteConfig.features;
+const { ads, legal } = siteConfig.features;
 const clientId = ads.adsense.clientId;
+const consentVersion = legal.consentVersion;
 
 // Check if we have valid configuration
-const hasValidConfig = 
-  ads.enabled && 
-  clientId.trim().length > 0 && 
+const hasValidConfig =
+  ads.enabled &&
+  clientId.trim().length > 0 &&
   slotId.trim().length > 0;
 
 const isDev = import.meta.env.DEV;
-
-// Determine what to render
-const showPlaceholder = !hasValidConfig && isDev;
-const showAd = hasValidConfig;
 
 // Build container classes
 const containerClasses = [
@@ -57,7 +57,8 @@ const containerClasses = [
 ].filter(Boolean).join(' ');
 ---
 
-{showPlaceholder && (
+{/* Dev mode: Show placeholder if config is missing */}
+{!hasValidConfig && isDev && (
   <div class={containerClasses} style={style}>
     <GlassCard class="ad-placeholder-card">
       <div class="ad-placeholder-content">
@@ -69,25 +70,141 @@ const containerClasses = [
   </div>
 )}
 
-{showAd && (
-  <div class={containerClasses} style={style}>
+{/* Valid config: Render consent-gated ad slot */}
+{hasValidConfig && (
+  <div
+    class={containerClasses}
+    style={style}
+    data-ad-slot-container
+    data-consent-version={consentVersion}
+    data-is-dev={isDev.toString()}
+    data-label={label}
+  >
+    {/* Placeholder shown when no consent (dev only) */}
+    <div class="ad-no-consent-placeholder" hidden>
+      <GlassCard class="ad-placeholder-card">
+        <div class="ad-placeholder-content">
+          <span class="ad-placeholder-icon">🚫</span>
+          <span class="ad-placeholder-text">{label}</span>
+          <span class="ad-placeholder-hint">Ads disabled (no consent)</span>
+        </div>
+      </GlassCard>
+    </div>
+
+    {/* Actual ad slot - hidden until consent confirmed */}
     <ins
-      class="adsbygoogle"
-      style="display:block"
+      class="adsbygoogle ad-slot-ins"
+      style="display:none"
       data-ad-client={clientId}
       data-ad-slot={slotId}
       data-ad-format={format}
       data-full-width-responsive={fullWidthResponsive ? 'true' : 'false'}
     />
-    <script is:inline>
-      try {
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        // Ad blocked or script failed - fail silently
-      }
-    </script>
   </div>
 )}
+
+<script>
+  (function() {
+    try {
+      var CONSENT_COOKIE = 'tsk_consent';
+      var CONSENT_STORAGE = 'tsk.consent';
+
+      // Find all ad slot containers on this page
+      var containers = document.querySelectorAll('[data-ad-slot-container]');
+
+      if (containers.length === 0) return;
+
+      // Read consent
+      function getCookie(name) {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i];
+          var parts = cookie.split('=');
+          if (parts[0].trim() === name) {
+            try {
+              return decodeURIComponent(parts.slice(1).join('='));
+            } catch (e) {
+              return parts.slice(1).join('=');
+            }
+          }
+        }
+        return null;
+      }
+
+      function readConsent(version) {
+        // Try cookie first
+        var cookieValue = getCookie(CONSENT_COOKIE);
+        if (cookieValue) {
+          try {
+            var parsed = JSON.parse(cookieValue);
+            if (parsed && parsed.version === version && parsed.necessary === true) {
+              return parsed;
+            }
+          } catch (e) {}
+        }
+
+        // Try localStorage
+        try {
+          var stored = localStorage.getItem(CONSENT_STORAGE);
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (parsed && parsed.version === version && parsed.necessary === true) {
+              return parsed;
+            }
+          }
+        } catch (e) {}
+
+        return null;
+      }
+
+      containers.forEach(function(container) {
+        var version = container.getAttribute('data-consent-version') || '1';
+        var isDev = container.getAttribute('data-is-dev') === 'true';
+        var consent = readConsent(version);
+        var hasAdsConsent = consent && consent.ads === true;
+
+        var placeholder = container.querySelector('.ad-no-consent-placeholder');
+        var insElement = container.querySelector('.ad-slot-ins');
+
+        if (hasAdsConsent && insElement) {
+          // Show the ad slot and push
+          insElement.style.display = 'block';
+          if (placeholder) placeholder.hidden = true;
+
+          // Only push if adsbygoogle exists (script loaded)
+          if (window.adsbygoogle) {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } else {
+            // Wait for AdSense script to load
+            var checkInterval = setInterval(function() {
+              if (window.adsbygoogle) {
+                clearInterval(checkInterval);
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+              }
+            }, 100);
+
+            // Give up after 5 seconds
+            setTimeout(function() {
+              clearInterval(checkInterval);
+            }, 5000);
+          }
+        } else {
+          // No consent
+          if (isDev && placeholder) {
+            // Show placeholder in dev
+            placeholder.hidden = false;
+            if (insElement) insElement.style.display = 'none';
+          } else {
+            // In prod, just hide everything
+            container.style.display = 'none';
+          }
+        }
+      });
+    } catch (e) {
+      // Fail silently
+    }
+  })();
+</script>
 
 <style>
   .ad-slot {
@@ -128,6 +245,10 @@ const containerClasses = [
     opacity: 0.6;
   }
 
+  .ad-no-consent-placeholder[hidden] {
+    display: none;
+  }
+
   /* Hide ads in print mode */
   @media print {
     .no-print {
@@ -135,4 +256,3 @@ const containerClasses = [
     }
   }
 </style>
-

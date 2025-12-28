@@ -106,6 +106,7 @@ interface SeoConfig {
 
 interface LegalConfig {
   consentBanner: boolean;
+  consentVersion: string;
   privacyPage: boolean;
   cookiePage: boolean;
 }
@@ -248,6 +249,7 @@ export const siteConfig: SiteConfig = {
     // Legal compliance
     legal: {
       consentBanner: true, // Shows if ads or analytics enabled
+      consentVersion: '1', // Bump to force consent renewal
       privacyPage: true,
       cookiePage: true,
     },

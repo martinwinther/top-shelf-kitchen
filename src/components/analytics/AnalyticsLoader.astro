@@ -1,0 +1,192 @@
+---
+/**
+ * AnalyticsLoader - Consent-gated analytics script loader
+ *
+ * Only loads analytics scripts if:
+ * - analytics.enabled === true
+ * - User has given consent for analytics (via cookie/localStorage)
+ *
+ * Supports multiple providers:
+ * - cloudflare: Cloudflare Web Analytics
+ * - umami: Umami Analytics
+ * - plausible: Plausible Analytics
+ * - ga4: Google Analytics 4
+ * - custom: Custom script injection
+ *
+ * This ensures GDPR/privacy compliance by gating external analytics scripts.
+ */
+
+import { siteConfig } from '../../config/site';
+
+const { analytics, legal } = siteConfig.features;
+
+// Only render if analytics is enabled
+const shouldRender = analytics.enabled && analytics.provider !== 'none';
+const consentVersion = legal.consentVersion;
+
+// Build provider-specific script data
+const providerData = {
+  provider: analytics.provider,
+  cloudflare: analytics.cloudflare,
+  umami: analytics.umami,
+  plausible: analytics.plausible,
+  ga4: analytics.ga4,
+  custom: analytics.custom,
+};
+---
+
+{shouldRender && (
+  <script
+    is:inline
+    data-consent-version={consentVersion}
+    data-provider={analytics.provider}
+    data-cloudflare-token={analytics.cloudflare?.token || ''}
+    data-umami-website-id={analytics.umami?.websiteId || ''}
+    data-umami-script-url={analytics.umami?.scriptUrl || ''}
+    data-plausible-domain={analytics.plausible?.domain || ''}
+    data-plausible-script-url={analytics.plausible?.scriptUrl || ''}
+    data-ga4-measurement-id={analytics.ga4?.measurementId || ''}
+    data-custom-script={analytics.custom?.script || ''}
+  >
+    (function() {
+      try {
+        var CONSENT_COOKIE = 'tsk_consent';
+        var CONSENT_STORAGE = 'tsk.consent';
+
+        var script = document.currentScript;
+        var consentVersion = script.getAttribute('data-consent-version') || '1';
+        var provider = script.getAttribute('data-provider');
+
+        // Read consent
+        function getCookie(name) {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            var parts = cookie.split('=');
+            if (parts[0].trim() === name) {
+              try {
+                return decodeURIComponent(parts.slice(1).join('='));
+              } catch (e) {
+                return parts.slice(1).join('=');
+              }
+            }
+          }
+          return null;
+        }
+
+        function readConsent(version) {
+          // Try cookie first
+          var cookieValue = getCookie(CONSENT_COOKIE);
+          if (cookieValue) {
+            try {
+              var parsed = JSON.parse(cookieValue);
+              if (parsed && parsed.version === version && parsed.necessary === true) {
+                return parsed;
+              }
+            } catch (e) {}
+          }
+
+          // Try localStorage
+          try {
+            var stored = localStorage.getItem(CONSENT_STORAGE);
+            if (stored) {
+              var parsed = JSON.parse(stored);
+              if (parsed && parsed.version === version && parsed.necessary === true) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+
+          return null;
+        }
+
+        var consent = readConsent(consentVersion);
+
+        // Only load analytics if user has given consent
+        if (!consent || consent.analytics !== true) {
+          return;
+        }
+
+        // Load provider-specific scripts
+        function injectScript(src, attrs) {
+          var s = document.createElement('script');
+          s.src = src;
+          s.async = true;
+          if (attrs) {
+            for (var key in attrs) {
+              if (attrs.hasOwnProperty(key)) {
+                s.setAttribute(key, attrs[key]);
+              }
+            }
+          }
+          document.head.appendChild(s);
+        }
+
+        function injectInlineScript(code) {
+          var s = document.createElement('script');
+          s.textContent = code;
+          document.head.appendChild(s);
+        }
+
+        switch (provider) {
+          case 'cloudflare':
+            var cfToken = script.getAttribute('data-cloudflare-token');
+            if (cfToken) {
+              injectScript('https://static.cloudflareinsights.com/beacon.min.js', {
+                'data-cf-beacon': JSON.stringify({ token: cfToken })
+              });
+            }
+            break;
+
+          case 'umami':
+            var umamiWebsiteId = script.getAttribute('data-umami-website-id');
+            var umamiScriptUrl = script.getAttribute('data-umami-script-url');
+            if (umamiWebsiteId && umamiScriptUrl) {
+              injectScript(umamiScriptUrl, {
+                'data-website-id': umamiWebsiteId
+              });
+            }
+            break;
+
+          case 'plausible':
+            var plausibleDomain = script.getAttribute('data-plausible-domain');
+            var plausibleScriptUrl = script.getAttribute('data-plausible-script-url') || 'https://plausible.io/js/script.js';
+            if (plausibleDomain) {
+              injectScript(plausibleScriptUrl, {
+                'data-domain': plausibleDomain
+              });
+            }
+            break;
+
+          case 'ga4':
+            var ga4MeasurementId = script.getAttribute('data-ga4-measurement-id');
+            if (ga4MeasurementId) {
+              // Load gtag.js
+              injectScript('https://www.googletagmanager.com/gtag/js?id=' + ga4MeasurementId);
+              // Initialize gtag
+              window.dataLayer = window.dataLayer || [];
+              function gtag() { window.dataLayer.push(arguments); }
+              gtag('js', new Date());
+              gtag('config', ga4MeasurementId);
+            }
+            break;
+
+          case 'custom':
+            var customScript = script.getAttribute('data-custom-script');
+            if (customScript) {
+              // Check if it's a URL or inline script
+              if (customScript.startsWith('http://') || customScript.startsWith('https://')) {
+                injectScript(customScript);
+              } else {
+                injectInlineScript(customScript);
+              }
+            }
+            break;
+        }
+      } catch (e) {
+        // Fail silently
+      }
+    })();
+  </script>
+)}
+

@@ -6,6 +6,8 @@ import SearchButton from '../components/search/SearchButton.astro';
 import { SearchModal } from '../components/react/SearchModal';
 import AdsenseHead from '../components/ads/AdsenseHead.astro';
 import AdSlot from '../components/ads/AdSlot.astro';
+import ConsentBanner from '../components/legal/ConsentBanner.astro';
+import AnalyticsLoader from '../components/analytics/AnalyticsLoader.astro';
 
 interface Props {
   title?: string;
@@ -180,14 +182,17 @@ const currentYear = new Date().getFullYear();
       )}
     </div>
 
-    {showAnalytics && (
-      <!-- Analytics placeholder - scripts added when analytics fully implemented -->
-      <!-- Analytics provider: {siteConfig.features.analytics.provider} -->
-    )}
+    {/* Analytics loader - consent-gated */}
+    <AnalyticsLoader />
 
+    {/* Consent banner - shown if ads or analytics enabled and legal.consentBanner is true */}
     {showConsentBanner && (
-      <!-- Consent banner root - UI component added when consent manager implemented -->
-      <div id="consent-root"></div>
+      <ConsentBanner
+        version={siteConfig.features.legal.consentVersion}
+        siteName={siteConfig.site.name}
+        showAds={siteConfig.features.ads.enabled}
+        showAnalytics={siteConfig.features.analytics.enabled}
+      />
     )}
 
     {showSearch && (

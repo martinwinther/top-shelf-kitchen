@@ -1,44 +1,112 @@
 ---
 /**
- * AdsenseHead - Injects AdSense loader script in <head>
- * 
- * Only renders when:
+ * AdsenseHead - Conditionally injects AdSense loader script in <head>
+ *
+ * Only renders bootstrap script when:
  * - ads.enabled === true
  * - provider === "adsense"
  * - clientId exists (non-empty)
- * 
- * Handles personalization mode based on config.
+ *
+ * The actual AdSense script is injected dynamically only if:
+ * - User has given consent for ads (via cookie/localStorage)
+ *
+ * This ensures GDPR/privacy compliance by gating external ad scripts.
  */
 
 import { siteConfig } from '../../config/site';
 
-const { ads } = siteConfig.features;
+const { ads, legal } = siteConfig.features;
 
 // Only render if ads are enabled, provider is adsense, and clientId exists
-const shouldRender = 
-  ads.enabled && 
-  ads.provider === 'adsense' && 
+const shouldRender =
+  ads.enabled &&
+  ads.provider === 'adsense' &&
   ads.adsense.clientId.trim().length > 0;
 
 const clientId = ads.adsense.clientId;
 const isNonPersonalized = ads.personalization === 'nonPersonalizedByDefault';
+const consentVersion = legal.consentVersion;
 ---
 
 {shouldRender && (
-  <>
-    {/* Set non-personalized ads mode before loading AdSense */}
-    {isNonPersonalized && (
-      <script is:inline>
-        (adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
-      </script>
-    )}
-    
-    {/* AdSense loader script */}
-    <script
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clientId}`}
-      crossorigin="anonymous"
-    />
-  </>
-)}
+  <script
+    is:inline
+    data-client-id={clientId}
+    data-non-personalized={isNonPersonalized.toString()}
+    data-consent-version={consentVersion}
+  >
+    (function() {
+      try {
+        var CONSENT_COOKIE = 'tsk_consent';
+        var CONSENT_STORAGE = 'tsk.consent';
 
+        var script = document.currentScript;
+        var clientId = script.getAttribute('data-client-id');
+        var nonPersonalized = script.getAttribute('data-non-personalized') === 'true';
+        var consentVersion = script.getAttribute('data-consent-version') || '1';
+
+        // Read consent from cookie or localStorage
+        function getCookie(name) {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            var parts = cookie.split('=');
+            if (parts[0].trim() === name) {
+              try {
+                return decodeURIComponent(parts.slice(1).join('='));
+              } catch (e) {
+                return parts.slice(1).join('=');
+              }
+            }
+          }
+          return null;
+        }
+
+        function readConsent() {
+          // Try cookie first
+          var cookieValue = getCookie(CONSENT_COOKIE);
+          if (cookieValue) {
+            try {
+              var parsed = JSON.parse(cookieValue);
+              if (parsed && parsed.version === consentVersion && parsed.necessary === true) {
+                return parsed;
+              }
+            } catch (e) {}
+          }
+
+          // Try localStorage
+          try {
+            var stored = localStorage.getItem(CONSENT_STORAGE);
+            if (stored) {
+              var parsed = JSON.parse(stored);
+              if (parsed && parsed.version === consentVersion && parsed.necessary === true) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+
+          return null;
+        }
+
+        var consent = readConsent();
+
+        // Only load AdSense if user has given ads consent
+        if (consent && consent.ads === true) {
+          // Set non-personalized ads mode if configured
+          if (nonPersonalized) {
+            (window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
+          }
+
+          // Dynamically inject the AdSense script
+          var adsScript = document.createElement('script');
+          adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + clientId;
+          adsScript.async = true;
+          adsScript.crossOrigin = 'anonymous';
+          document.head.appendChild(adsScript);
+        }
+      } catch (e) {
+        // Fail silently - ad blocker or other issue
+      }
+    })();
+  </script>
+)}
