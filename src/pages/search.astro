@@ -1,0 +1,131 @@
+---
+/**
+ * Search Page - Dedicated full-page search experience
+ * 
+ * Provides a fallback for users who prefer a dedicated search page
+ * or have JavaScript disabled (shows link to recipes).
+ */
+
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { siteConfig } from '../config/site';
+
+const searchEnabled = siteConfig.features.search.enabled;
+---
+
+<SiteLayout title="Search">
+  <div class="search-page" data-pagefind-ignore>
+    <header class="page-header">
+      <h1>Search Recipes</h1>
+      <p class="subtitle">Find recipes by title, ingredients, or description.</p>
+    </header>
+
+    {searchEnabled ? (
+      <div class="search-content">
+        <p class="search-hint">
+          Press <kbd>⌘</kbd><kbd>K</kbd> (or <kbd>Ctrl</kbd><kbd>K</kbd>) to open search,
+          or use the search button in the header.
+        </p>
+        <button 
+          type="button" 
+          class="open-search-btn"
+          data-search-trigger
+        >
+          Open Search
+        </button>
+      </div>
+    ) : (
+      <div class="search-disabled">
+        <p>Search is currently disabled.</p>
+        <a href="/recipes">Browse all recipes →</a>
+      </div>
+    )}
+  </div>
+</SiteLayout>
+
+<style>
+  .search-page {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  .search-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+  }
+
+  .search-hint {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  kbd {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    font-family: system-ui, sans-serif;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.25rem;
+    color: var(--text);
+    margin: 0 0.1rem;
+  }
+
+  .open-search-btn {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .open-search-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .open-search-btn:active {
+    transform: scale(0.98);
+  }
+
+  .search-disabled {
+    padding: 2rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+  }
+
+  .search-disabled p {
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .search-disabled a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .search-disabled a:hover {
+    opacity: 0.8;
+  }
+</style>
+

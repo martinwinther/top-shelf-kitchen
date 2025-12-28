@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import { siteConfig, shouldShowConsentBanner } from '../config/site';
 import Button from '../components/ui/Button.astro';
+import SearchButton from '../components/search/SearchButton.astro';
+import { SearchModal } from '../components/react/SearchModal';
 
 interface Props {
   title?: string;
@@ -41,6 +43,7 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
 const currentPath = Astro.url.pathname;
 
 // Feature flags
+const showSearch = siteConfig.features.search.enabled;
 const showAds = siteConfig.features.ads.enabled;
 const showSidebarAd = showAds && siteConfig.features.ads.slots.sidebar;
 const showBottomBannerAd = showAds && siteConfig.features.ads.slots.bottomBanner;
@@ -113,6 +116,7 @@ const currentYear = new Date().getFullYear();
                 {item.label}
               </Button>
             ))}
+            {showSearch && <SearchButton />}
           </nav>
         </div>
       </header>
@@ -168,6 +172,14 @@ const currentYear = new Date().getFullYear();
     {showConsentBanner && (
       <!-- Consent banner root - UI component added when consent manager implemented -->
       <div id="consent-root"></div>
+    )}
+
+    {showSearch && (
+      <SearchModal 
+        client:idle
+        siteName={siteConfig.site.name}
+        enabled={showSearch}
+      />
     )}
   </body>
 </html>

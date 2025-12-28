@@ -172,21 +172,21 @@ export const siteConfig: SiteConfig = {
     },
 
     recipeScaling: {
-      enabled: true,
+      enabled: false,
       defaultServings: 4,
     },
 
     cookingMode: {
-      enabled: true,
+      enabled: false,
       keepAwake: true,
     },
 
     print: {
-      enabled: true,
+      enabled: false,
     },
 
     share: {
-      enabled: true,
+      enabled: false,
       socialLinks: false,
     },
 
