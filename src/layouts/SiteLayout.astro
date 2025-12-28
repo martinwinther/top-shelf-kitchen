@@ -4,6 +4,8 @@ import { siteConfig, shouldShowConsentBanner } from '../config/site';
 import Button from '../components/ui/Button.astro';
 import SearchButton from '../components/search/SearchButton.astro';
 import { SearchModal } from '../components/react/SearchModal';
+import AdsenseHead from '../components/ads/AdsenseHead.astro';
+import AdSlot from '../components/ads/AdSlot.astro';
 
 interface Props {
   title?: string;
@@ -92,6 +94,9 @@ const currentYear = new Date().getFullYear();
       <meta name="twitter:creator" content={siteConfig.features.seo.twitterHandle} />
     )}
     <slot name="head" />
+    
+    {/* AdSense script loader (only when ads enabled + configured) */}
+    <AdsenseHead />
   </head>
   <body>
     <!-- Skip to content link for accessibility -->
@@ -123,15 +128,19 @@ const currentYear = new Date().getFullYear();
 
       <!-- Main content area with optional sidebar -->
       <div class="content-wrapper">
-        <main id="main-content" class="main-content">
+        <main id="main-content" class:list={["main-content", { "main-content--with-bottom-ad": showBottomBannerAd }]}>
           <slot />
         </main>
 
         {showSidebarAd && (
-          <!-- Ad placeholder: Sidebar (desktop only) - scripts added when ads fully implemented -->
-          <aside class="sidebar-ad" aria-hidden="true">
-            <div data-ad-slot="sidebar" class="ad-placeholder">
-              <!-- AdSense sidebar slot will be rendered here -->
+          <aside class="sidebar-ad no-print" aria-label="Advertisement">
+            <div class="sidebar-ad-container">
+              <AdSlot
+                slotId={siteConfig.features.ads.adsense.sidebarSlotId}
+                format="vertical"
+                label="Sidebar ad"
+                class="sidebar-ad-slot"
+              />
             </div>
           </aside>
         )}
@@ -157,9 +166,16 @@ const currentYear = new Date().getFullYear();
       </footer>
 
       {showBottomBannerAd && (
-        <!-- Ad placeholder: Bottom banner - scripts added when ads fully implemented -->
-        <div data-ad-slot="bottomBanner" class="bottom-banner-ad ad-placeholder" aria-hidden="true">
-          <!-- AdSense bottom banner slot will be rendered here -->
+        <div class="bottom-banner-ad no-print" role="complementary" aria-label="Advertisement">
+          <div class="bottom-banner-container">
+            <AdSlot
+              slotId={siteConfig.features.ads.adsense.bottomSlotId}
+              format="horizontal"
+              label="Bottom banner ad"
+              class="bottom-banner-slot"
+              style="width: 100%; min-height: 90px;"
+            />
+          </div>
         </div>
       )}
     </div>
@@ -278,7 +294,12 @@ const currentYear = new Date().getFullYear();
     min-width: 0;
   }
 
-  /* Sidebar ad */
+  /* Add bottom padding when bottom banner ad is enabled */
+  .main-content--with-bottom-ad {
+    padding-bottom: 6rem;
+  }
+
+  /* Sidebar ad - desktop only */
   .sidebar-ad {
     display: none;
     width: 300px;
@@ -291,26 +312,57 @@ const currentYear = new Date().getFullYear();
     }
   }
 
-  .ad-placeholder {
-    background: var(--glass-bg);
-    border: 1px dashed var(--glass-border);
-    border-radius: var(--radius-xl);
+  .sidebar-ad-container {
+    position: sticky;
+    top: 5rem; /* Below sticky header */
+    width: 300px;
     min-height: 250px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+
+  .sidebar-ad-slot {
+    width: 100%;
+    min-height: 250px;
+  }
+
+  /* Bottom banner ad - fixed at bottom */
+  .bottom-banner-ad {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--glass-border);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .bottom-banner-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.5rem 1rem;
+    min-height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  /* Bottom banner ad */
-  .bottom-banner-ad {
-    position: sticky;
-    bottom: 0;
+  .bottom-banner-slot {
     width: 100%;
+    max-width: 728px; /* Standard leaderboard size */
     min-height: 90px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--glass-border);
+  }
+
+  /* Hide ads in print mode */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
   }
 
   /* Footer */

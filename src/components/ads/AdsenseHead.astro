@@ -1,0 +1,44 @@
+---
+/**
+ * AdsenseHead - Injects AdSense loader script in <head>
+ * 
+ * Only renders when:
+ * - ads.enabled === true
+ * - provider === "adsense"
+ * - clientId exists (non-empty)
+ * 
+ * Handles personalization mode based on config.
+ */
+
+import { siteConfig } from '../../config/site';
+
+const { ads } = siteConfig.features;
+
+// Only render if ads are enabled, provider is adsense, and clientId exists
+const shouldRender = 
+  ads.enabled && 
+  ads.provider === 'adsense' && 
+  ads.adsense.clientId.trim().length > 0;
+
+const clientId = ads.adsense.clientId;
+const isNonPersonalized = ads.personalization === 'nonPersonalizedByDefault';
+---
+
+{shouldRender && (
+  <>
+    {/* Set non-personalized ads mode before loading AdSense */}
+    {isNonPersonalized && (
+      <script is:inline>
+        (adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
+      </script>
+    )}
+    
+    {/* AdSense loader script */}
+    <script
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clientId}`}
+      crossorigin="anonymous"
+    />
+  </>
+)}
+

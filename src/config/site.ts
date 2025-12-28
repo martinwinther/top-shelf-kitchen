@@ -61,7 +61,7 @@ interface AdsConfig {
     bottomBanner: boolean;
   };
   adsense: AdsenseConfig;
-  personalization: 'nonPersonalizedByDefault' | 'personalized';
+  personalization: 'nonPersonalizedByDefault' | 'personalizedAllowed';
 }
 
 interface AnalyticsConfig {

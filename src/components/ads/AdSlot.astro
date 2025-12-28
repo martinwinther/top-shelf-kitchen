@@ -1,0 +1,138 @@
+---
+/**
+ * AdSlot - Reusable AdSense ad slot component
+ * 
+ * Renders an AdSense <ins> element with proper configuration.
+ * In dev mode with missing config, shows a placeholder.
+ * In prod with missing config, renders nothing.
+ */
+
+import { siteConfig } from '../../config/site';
+import GlassCard from '../ui/GlassCard.astro';
+
+interface Props {
+  /** The AdSense slot ID */
+  slotId: string;
+  /** Ad format */
+  format?: 'auto' | 'vertical' | 'horizontal' | 'rectangle';
+  /** Enable full-width responsive behavior */
+  fullWidthResponsive?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  /** Inline styles */
+  style?: string;
+  /** Label for dev placeholder */
+  label?: string;
+}
+
+const {
+  slotId,
+  format = 'auto',
+  fullWidthResponsive = true,
+  class: className = '',
+  style = '',
+  label = 'Ad slot',
+} = Astro.props;
+
+const { ads } = siteConfig.features;
+const clientId = ads.adsense.clientId;
+
+// Check if we have valid configuration
+const hasValidConfig = 
+  ads.enabled && 
+  clientId.trim().length > 0 && 
+  slotId.trim().length > 0;
+
+const isDev = import.meta.env.DEV;
+
+// Determine what to render
+const showPlaceholder = !hasValidConfig && isDev;
+const showAd = hasValidConfig;
+
+// Build container classes
+const containerClasses = [
+  'ad-slot',
+  'no-print',
+  className,
+].filter(Boolean).join(' ');
+---
+
+{showPlaceholder && (
+  <div class={containerClasses} style={style}>
+    <GlassCard class="ad-placeholder-card">
+      <div class="ad-placeholder-content">
+        <span class="ad-placeholder-icon">📢</span>
+        <span class="ad-placeholder-text">{label}</span>
+        <span class="ad-placeholder-hint">(missing config)</span>
+      </div>
+    </GlassCard>
+  </div>
+)}
+
+{showAd && (
+  <div class={containerClasses} style={style}>
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={clientId}
+      data-ad-slot={slotId}
+      data-ad-format={format}
+      data-full-width-responsive={fullWidthResponsive ? 'true' : 'false'}
+    />
+    <script is:inline>
+      try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        // Ad blocked or script failed - fail silently
+      }
+    </script>
+  </div>
+)}
+
+<style>
+  .ad-slot {
+    /* Ensure container never collapses */
+    min-width: 0;
+  }
+
+  .ad-placeholder-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    border-style: dashed;
+  }
+
+  .ad-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .ad-placeholder-icon {
+    font-size: 1.5rem;
+    opacity: 0.6;
+  }
+
+  .ad-placeholder-text {
+    font-size: 0.875rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .ad-placeholder-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  /* Hide ads in print mode */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+  }
+</style>
+
