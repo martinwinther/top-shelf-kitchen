@@ -202,3 +202,21 @@ export function hasAnalyticsConsent(version: string): boolean {
   return consent?.analytics === true;
 }
 
+/**
+ * Opens the consent preferences modal by dispatching a custom event.
+ * The ConsentBanner component listens for this event.
+ */
+export function openConsentModal(): void {
+  if (!isBrowser()) return;
+  window.dispatchEvent(new Event('tsk:open-consent'));
+}
+
+/**
+ * Navigates to the privacy page with manage-consent hash.
+ * Useful for links that want to open the modal on the privacy page.
+ */
+export function navigateToManageConsent(): void {
+  if (!isBrowser()) return;
+  window.location.href = '/privacy#manage-consent';
+}
+

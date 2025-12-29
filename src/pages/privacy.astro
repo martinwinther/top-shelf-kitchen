@@ -1,0 +1,508 @@
+---
+/**
+ * Privacy & Consent Page
+ *
+ * Documents cookie categories and provides consent management.
+ * Shows current consent state and allows users to manage preferences.
+ */
+
+import SiteLayout from '../layouts/SiteLayout.astro';
+import GlassCard from '../components/ui/GlassCard.astro';
+import Button from '../components/ui/Button.astro';
+import { siteConfig, shouldShowConsentBanner } from '../config/site';
+
+const showConsentBanner = shouldShowConsentBanner();
+const showAds = siteConfig.features.ads.enabled;
+const showAnalytics = siteConfig.features.analytics.enabled;
+const consentVersion = siteConfig.features.legal.consentVersion;
+---
+
+<SiteLayout
+  title="Privacy & Consent"
+  description="Learn about how we use cookies and manage your consent preferences."
+  canonicalPath="/privacy"
+>
+  <div class="privacy-page" data-pagefind-ignore>
+    <header class="privacy-header">
+      <h1 class="privacy-title">Privacy & Consent</h1>
+      <p class="privacy-intro">
+        We respect your privacy. This page explains what data we collect and how you can control it.
+      </p>
+    </header>
+
+    <section class="privacy-section">
+      <h2 class="section-title">Cookie Categories</h2>
+      <p class="section-intro">
+        We use cookies for different purposes. Here's what each category does:
+      </p>
+
+      <div class="consent-categories">
+        <!-- Essential -->
+        <GlassCard class="category-card">
+          <div class="category-header">
+            <span class="category-icon">🔒</span>
+            <h3 class="category-name">Essential</h3>
+            <span class="category-badge category-badge--always">Always on</span>
+          </div>
+          <p class="category-desc">
+            Required for the site to function properly. These cookies enable core features like
+            page navigation, saving your consent preferences, and security. They cannot be disabled.
+          </p>
+          <div class="category-examples">
+            <strong>Examples:</strong> Consent state storage
+          </div>
+        </GlassCard>
+
+        {showAds && (
+          <GlassCard class="category-card">
+            <div class="category-header">
+              <span class="category-icon">📢</span>
+              <h3 class="category-name">Advertising</h3>
+              <span class="category-badge category-badge--optional">Optional</span>
+            </div>
+            <p class="category-desc">
+              Enables display advertising on the site. We use Google AdSense with
+              <strong> non-personalized ads by default</strong>, which means ads are based on page
+              content rather than your browsing history.
+            </p>
+            <div class="category-examples">
+              <strong>Provider:</strong> Google AdSense
+            </div>
+          </GlassCard>
+        )}
+
+        {showAnalytics && (
+          <GlassCard class="category-card">
+            <div class="category-header">
+              <span class="category-icon">📊</span>
+              <h3 class="category-name">Analytics</h3>
+              <span class="category-badge category-badge--optional">Optional</span>
+            </div>
+            <p class="category-desc">
+              Helps us understand how visitors use the site. This data is used to improve the
+              user experience and content. Analytics data is typically aggregated and anonymized.
+            </p>
+            <div class="category-examples">
+              <strong>Provider:</strong> {siteConfig.features.analytics.provider === 'none' ? 'Not configured' : siteConfig.features.analytics.provider}
+            </div>
+          </GlassCard>
+        )}
+      </div>
+    </section>
+
+    {showConsentBanner && (
+      <section class="privacy-section">
+        <h2 class="section-title">Your Current Preferences</h2>
+
+        <GlassCard class="consent-status-card">
+          <div id="consent-status" class="consent-status" data-version={consentVersion}>
+            <p class="consent-status-loading">Loading your consent preferences...</p>
+          </div>
+
+          <div class="consent-actions">
+            <Button
+              type="button"
+              variant="primary"
+              data-consent-action="manage"
+            >
+              Manage consent
+            </Button>
+          </div>
+        </GlassCard>
+      </section>
+    )}
+
+    <section class="privacy-section">
+      <h2 class="section-title">Your Rights</h2>
+      <GlassCard>
+        <ul class="rights-list">
+          <li>
+            <strong>Withdraw consent:</strong> You can change or withdraw your consent at any time
+            using the "Manage consent" button above or in the site footer.
+          </li>
+          <li>
+            <strong>Changes take effect immediately:</strong> When you update your preferences,
+            the page will reload to apply your choices. Scripts you've disabled will not run.
+          </li>
+          <li>
+            <strong>Third-party cookies:</strong> Some cookies may be set by third-party services
+            (like ad networks). While we stop loading their scripts when you withdraw consent,
+            previously set cookies may remain until they expire naturally.
+          </li>
+        </ul>
+      </GlassCard>
+    </section>
+
+    <section class="privacy-section">
+      <h2 class="section-title">Contact</h2>
+      <p class="section-text">
+        If you have questions about our privacy practices, please contact us through
+        the channels listed on our <a href="/about">About page</a>.
+      </p>
+    </section>
+  </div>
+</SiteLayout>
+
+<script>
+  (function() {
+    const CONSENT_COOKIE = 'tsk_consent';
+    const CONSENT_STORAGE = 'tsk.consent';
+
+    const statusContainer = document.getElementById('consent-status');
+    if (!statusContainer) return;
+
+    const version = statusContainer.dataset.version || '1';
+
+    // Read consent
+    function getCookie(name: string): string | null {
+      const cookies = document.cookie.split(';');
+      for (const cookie of cookies) {
+        const [cookieName, ...valueParts] = cookie.split('=');
+        if (cookieName.trim() === name) {
+          try {
+            return decodeURIComponent(valueParts.join('='));
+          } catch {
+            return valueParts.join('=');
+          }
+        }
+      }
+      return null;
+    }
+
+    interface ConsentState {
+      necessary: true;
+      ads: boolean;
+      analytics: boolean;
+      version: string;
+      updatedAt: string;
+    }
+
+    function readConsent(): ConsentState | null {
+      const cookieValue = getCookie(CONSENT_COOKIE);
+      if (cookieValue) {
+        try {
+          const parsed = JSON.parse(cookieValue);
+          if (parsed && parsed.version === version && parsed.necessary === true) {
+            return parsed as ConsentState;
+          }
+        } catch {}
+      }
+
+      try {
+        const stored = localStorage.getItem(CONSENT_STORAGE);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.version === version && parsed.necessary === true) {
+            return parsed as ConsentState;
+          }
+        }
+      } catch {}
+
+      return null;
+    }
+
+    function formatDate(isoString: string): string {
+      try {
+        return new Date(isoString).toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      } catch {
+        return 'Unknown';
+      }
+    }
+
+    function renderStatus(consent: ConsentState | null): void {
+      if (!consent) {
+        statusContainer.innerHTML = `
+          <div class="consent-status-item consent-status-item--warning">
+            <span class="status-icon">⚠️</span>
+            <span class="status-text">No consent recorded yet. Use the button below to set your preferences.</span>
+          </div>
+        `;
+        return;
+      }
+
+      const items: string[] = [];
+
+      items.push(`
+        <div class="consent-status-item">
+          <span class="status-label">Essential:</span>
+          <span class="status-value status-value--enabled">Always enabled</span>
+        </div>
+      `);
+
+      if (document.querySelector('[data-show-ads="true"]') || consent.ads !== undefined) {
+        items.push(`
+          <div class="consent-status-item">
+            <span class="status-label">Advertising:</span>
+            <span class="status-value ${consent.ads ? 'status-value--enabled' : 'status-value--disabled'}">
+              ${consent.ads ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
+        `);
+      }
+
+      if (document.querySelector('[data-show-analytics="true"]') || consent.analytics !== undefined) {
+        items.push(`
+          <div class="consent-status-item">
+            <span class="status-label">Analytics:</span>
+            <span class="status-value ${consent.analytics ? 'status-value--enabled' : 'status-value--disabled'}">
+              ${consent.analytics ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
+        `);
+      }
+
+      items.push(`
+        <div class="consent-status-item consent-status-item--meta">
+          <span class="status-label">Last updated:</span>
+          <span class="status-value">${formatDate(consent.updatedAt)}</span>
+        </div>
+      `);
+
+      statusContainer.innerHTML = items.join('');
+    }
+
+    // Render on load
+    const consent = readConsent();
+    renderStatus(consent);
+  })();
+</script>
+
+<style>
+  .privacy-page {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .privacy-header {
+    margin-bottom: 3rem;
+  }
+
+  .privacy-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
+  }
+
+  .privacy-intro {
+    font-size: 1.125rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .privacy-section {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+  }
+
+  .section-intro {
+    color: var(--muted);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+  }
+
+  .section-text {
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .section-text a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .section-text a:hover {
+    text-decoration: underline;
+  }
+
+  /* Categories */
+  .consent-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .category-card {
+    padding: 1.5rem !important;
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .category-icon {
+    font-size: 1.5rem;
+  }
+
+  .category-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    flex: 1;
+  }
+
+  .category-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+  }
+
+  .category-badge--always {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .category-badge--optional {
+    background: var(--glass-bg);
+    color: var(--muted);
+    border: 1px solid var(--glass-border);
+  }
+
+  .category-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+  }
+
+  .category-examples {
+    font-size: 0.8rem;
+    color: var(--muted);
+    opacity: 0.8;
+  }
+
+  /* Consent status */
+  .consent-status-card {
+    padding: 1.5rem !important;
+  }
+
+  .consent-status {
+    margin-bottom: 1.5rem;
+  }
+
+  .consent-status-loading {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .consent-status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .consent-status-item:last-child {
+    border-bottom: none;
+  }
+
+  .consent-status-item--warning {
+    padding: 1rem;
+    background: rgba(255, 200, 0, 0.1);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 200, 0, 0.2);
+  }
+
+  .consent-status-item--meta {
+    opacity: 0.7;
+  }
+
+  .status-icon {
+    font-size: 1.25rem;
+  }
+
+  .status-label {
+    font-weight: 500;
+    color: var(--text);
+    min-width: 7rem;
+  }
+
+  .status-text {
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  .status-value {
+    color: var(--muted);
+  }
+
+  .status-value--enabled {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .status-value--disabled {
+    color: var(--muted);
+  }
+
+  .consent-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  /* Rights list */
+  .rights-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .rights-list li {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .rights-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .rights-list strong {
+    color: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .privacy-title {
+      font-size: 2rem;
+    }
+
+    .category-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .category-name {
+      flex: none;
+    }
+  }
+</style>
+

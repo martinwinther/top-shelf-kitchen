@@ -159,6 +159,19 @@ const currentYear = new Date().getFullYear();
                 {item.label}
               </a>
             ))}
+            {showConsentBanner && (
+              <>
+                <a href="/privacy" class="footer-link">Privacy</a>
+                <button
+                  type="button"
+                  class="footer-link footer-link--button"
+                  data-consent-action="manage"
+                  aria-label="Manage cookie consent preferences"
+                >
+                  Manage consent
+                </button>
+              </>
+            )}
           </nav>
 
           <p class="footer-copyright">
@@ -418,6 +431,14 @@ const currentYear = new Date().getFullYear();
   .footer-link:hover {
     color: var(--text);
     opacity: 1;
+  }
+
+  .footer-link--button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
   }
 
   .footer-copyright {

@@ -316,13 +316,40 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
     });
 
     // -------------------------------------------------------------------------
-    // Init: Check if banner should show
+    // Global API: Allow external triggers to open modal
+    // -------------------------------------------------------------------------
+
+    // Expose openModal globally for external triggers
+    (window as any).tskOpenConsentModal = openModal;
+
+    // Listen for custom event
+    window.addEventListener('tsk:open-consent', () => {
+      openModal();
+    });
+
+    // Check for #manage-consent hash
+    function checkHash(): void {
+      if (window.location.hash === '#manage-consent') {
+        openModal();
+        // Clear hash after opening to allow re-triggering
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', checkHash);
+
+    // -------------------------------------------------------------------------
+    // Init: Check if banner should show + check hash
     // -------------------------------------------------------------------------
 
     const existingConsent = readConsent();
     if (!existingConsent) {
       showBanner();
     }
+
+    // Check hash on page load (after small delay to ensure DOM is ready)
+    setTimeout(checkHash, 0);
   })();
 </script>
 
