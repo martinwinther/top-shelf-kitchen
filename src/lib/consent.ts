@@ -185,12 +185,21 @@ export function clearConsent(): void {
 }
 
 /**
+ * Checks if consent is granted for a specific category.
+ * Returns false if no consent found or version mismatch.
+ */
+export function hasConsent(version: string, key: 'ads' | 'analytics'): boolean {
+  const consent = readConsent(version);
+  if (!consent) return false;
+  return consent[key] === true;
+}
+
+/**
  * Checks if ads consent is granted.
  * Returns false if no consent found.
  */
 export function hasAdsConsent(version: string): boolean {
-  const consent = readConsent(version);
-  return consent?.ads === true;
+  return hasConsent(version, 'ads');
 }
 
 /**
@@ -198,8 +207,7 @@ export function hasAdsConsent(version: string): boolean {
  * Returns false if no consent found.
  */
 export function hasAnalyticsConsent(version: string): boolean {
-  const consent = readConsent(version);
-  return consent?.analytics === true;
+  return hasConsent(version, 'analytics');
 }
 
 /**

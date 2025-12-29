@@ -99,6 +99,9 @@ const currentYear = new Date().getFullYear();
     
     {/* AdSense script loader (only when ads enabled + configured) */}
     <AdsenseHead />
+    
+    {/* Analytics loader - consent-gated, must be in head */}
+    <AnalyticsLoader />
   </head>
   <body>
     <!-- Skip to content link for accessibility -->
@@ -130,7 +133,7 @@ const currentYear = new Date().getFullYear();
 
       <!-- Main content area with optional sidebar -->
       <div class="content-wrapper">
-        <main id="main-content" class:list={["main-content", { "main-content--with-bottom-ad": showBottomBannerAd }]}>
+        <main id="main-content" class="main-content">
           <slot />
         </main>
 
@@ -195,9 +198,6 @@ const currentYear = new Date().getFullYear();
       )}
     </div>
 
-    {/* Analytics loader - consent-gated */}
-    <AnalyticsLoader />
-
     {/* Consent banner - shown if ads or analytics enabled and legal.consentBanner is true */}
     {showConsentBanner && (
       <ConsentBanner
@@ -214,6 +214,58 @@ const currentYear = new Date().getFullYear();
         siteName={siteConfig.site.name}
         enabled={showSearch}
       />
+    )}
+
+    {/* Client-side script to toggle bottom ad spacing based on consent */}
+    {showBottomBannerAd && (
+      <script
+        is:inline
+        data-consent-version={siteConfig.features.legal.consentVersion}
+      >
+        (function() {
+          try {
+            var CONSENT_COOKIE = 'tsk_consent';
+            var CONSENT_STORAGE = 'tsk.consent';
+            var script = document.currentScript;
+            var version = script.getAttribute('data-consent-version') || '1';
+
+            function getCookie(name) {
+              var cookies = document.cookie.split(';');
+              for (var i = 0; i < cookies.length; i++) {
+                var parts = cookies[i].split('=');
+                if (parts[0].trim() === name) {
+                  try { return decodeURIComponent(parts.slice(1).join('=')); }
+                  catch (e) { return parts.slice(1).join('='); }
+                }
+              }
+              return null;
+            }
+
+            function readConsent() {
+              var cookieValue = getCookie(CONSENT_COOKIE);
+              if (cookieValue) {
+                try {
+                  var parsed = JSON.parse(cookieValue);
+                  if (parsed && parsed.version === version && parsed.necessary === true) return parsed;
+                } catch (e) {}
+              }
+              try {
+                var stored = localStorage.getItem(CONSENT_STORAGE);
+                if (stored) {
+                  var parsed = JSON.parse(stored);
+                  if (parsed && parsed.version === version && parsed.necessary === true) return parsed;
+                }
+              } catch (e) {}
+              return null;
+            }
+
+            var consent = readConsent();
+            if (consent && consent.ads === true) {
+              document.documentElement.classList.add('has-bottom-ad');
+            }
+          } catch (e) {}
+        })();
+      </script>
     )}
   </body>
 </html>
@@ -312,8 +364,8 @@ const currentYear = new Date().getFullYear();
     min-width: 0;
   }
 
-  /* Add bottom padding when bottom banner ad is enabled */
-  .main-content--with-bottom-ad {
+  /* Add bottom padding when bottom banner ad is active (consent-aware) */
+  :global(.has-bottom-ad) .main-content {
     padding-bottom: 6rem;
   }
 
