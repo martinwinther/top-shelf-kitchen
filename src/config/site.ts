@@ -66,12 +66,11 @@ interface AdsConfig {
 
 interface AnalyticsConfig {
   enabled: boolean;
-  provider: 'cloudflare' | 'umami' | 'plausible' | 'ga4' | 'custom' | 'none';
-  cloudflare?: { token: string };
-  umami?: { websiteId: string; scriptUrl: string };
-  plausible?: { domain: string; scriptUrl: string };
+  provider: 'none' | 'umami' | 'plausible' | 'ga4' | 'custom';
+  umami?: { websiteId: string; scriptUrl?: string };
+  plausible?: { domain: string; scriptUrl?: string };
   ga4?: { measurementId: string };
-  custom?: { script: string };
+  custom?: { scriptUrl?: string; inline?: string };
 }
 
 interface GiscusConfig {
@@ -210,11 +209,10 @@ export const siteConfig: SiteConfig = {
     analytics: {
       enabled: false,
       provider: 'none',
-      cloudflare: { token: '' },
-      umami: { websiteId: '', scriptUrl: '' },
-      plausible: { domain: '', scriptUrl: '' },
+      umami: { websiteId: '' },
+      plausible: { domain: '' },
       ga4: { measurementId: '' },
-      custom: { script: '' },
+      custom: {},
     },
 
     comments: {

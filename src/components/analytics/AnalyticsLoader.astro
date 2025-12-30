@@ -4,14 +4,14 @@
  *
  * Only loads analytics scripts if:
  * - analytics.enabled === true
- * - User has given consent for analytics (via cookie/localStorage)
+ * - analytics.provider !== 'none'
+ * - User has given consent for analytics (consent.analytics === true)
  *
- * Supports multiple providers:
- * - cloudflare: Cloudflare Web Analytics
- * - umami: Umami Analytics
- * - plausible: Plausible Analytics
+ * Supported providers:
+ * - umami: Privacy-focused analytics (default cloud or self-hosted)
+ * - plausible: Privacy-focused analytics
  * - ga4: Google Analytics 4
- * - custom: Custom script injection
+ * - custom: Custom script URL and/or inline script
  *
  * This ensures GDPR/privacy compliance by gating external analytics scripts.
  */
@@ -19,20 +19,64 @@
 import { siteConfig } from '../../config/site';
 
 const { analytics, legal } = siteConfig.features;
+const isDev = import.meta.env.DEV;
 
-// Only render if analytics is enabled
+// Only render if analytics is enabled and provider is configured
 const shouldRender = analytics.enabled && analytics.provider !== 'none';
 const consentVersion = legal.consentVersion;
 
-// Build provider-specific script data
+// Build provider-specific data attributes
 const providerData = {
-  provider: analytics.provider,
-  cloudflare: analytics.cloudflare,
-  umami: analytics.umami,
-  plausible: analytics.plausible,
-  ga4: analytics.ga4,
-  custom: analytics.custom,
+  umami: {
+    websiteId: analytics.umami?.websiteId || '',
+    scriptUrl: analytics.umami?.scriptUrl || 'https://cloud.umami.is/script.js',
+  },
+  plausible: {
+    domain: analytics.plausible?.domain || '',
+    scriptUrl: analytics.plausible?.scriptUrl || 'https://plausible.io/js/script.js',
+  },
+  ga4: {
+    measurementId: analytics.ga4?.measurementId || '',
+  },
+  custom: {
+    scriptUrl: analytics.custom?.scriptUrl || '',
+    inline: analytics.custom?.inline || '',
+  },
 };
+
+// Validate configuration in dev mode
+function validateConfig(): string[] {
+  const warnings: string[] = [];
+  
+  if (!analytics.enabled) return warnings;
+  
+  switch (analytics.provider) {
+    case 'umami':
+      if (!analytics.umami?.websiteId) {
+        warnings.push('[Analytics] Umami: websiteId is required but not configured');
+      }
+      break;
+    case 'plausible':
+      if (!analytics.plausible?.domain) {
+        warnings.push('[Analytics] Plausible: domain is required but not configured');
+      }
+      break;
+    case 'ga4':
+      if (!analytics.ga4?.measurementId) {
+        warnings.push('[Analytics] GA4: measurementId is required but not configured');
+      }
+      break;
+    case 'custom':
+      if (!analytics.custom?.scriptUrl && !analytics.custom?.inline) {
+        warnings.push('[Analytics] Custom: either scriptUrl or inline is required but neither is configured');
+      }
+      break;
+  }
+  
+  return warnings;
+}
+
+const devWarnings = isDev ? validateConfig() : [];
 ---
 
 {shouldRender && (
@@ -40,13 +84,15 @@ const providerData = {
     is:inline
     data-consent-version={consentVersion}
     data-provider={analytics.provider}
-    data-cloudflare-token={analytics.cloudflare?.token || ''}
-    data-umami-website-id={analytics.umami?.websiteId || ''}
-    data-umami-script-url={analytics.umami?.scriptUrl || ''}
-    data-plausible-domain={analytics.plausible?.domain || ''}
-    data-plausible-script-url={analytics.plausible?.scriptUrl || ''}
-    data-ga4-measurement-id={analytics.ga4?.measurementId || ''}
-    data-custom-script={analytics.custom?.script || ''}
+    data-is-dev={isDev ? 'true' : 'false'}
+    data-dev-warnings={JSON.stringify(devWarnings)}
+    data-umami-website-id={providerData.umami.websiteId}
+    data-umami-script-url={providerData.umami.scriptUrl}
+    data-plausible-domain={providerData.plausible.domain}
+    data-plausible-script-url={providerData.plausible.scriptUrl}
+    data-ga4-measurement-id={providerData.ga4.measurementId}
+    data-custom-script-url={providerData.custom.scriptUrl}
+    data-custom-inline={providerData.custom.inline}
   >
     (function() {
       try {
@@ -56,8 +102,21 @@ const providerData = {
         var script = document.currentScript;
         var consentVersion = script.getAttribute('data-consent-version') || '1';
         var provider = script.getAttribute('data-provider');
+        var isDev = script.getAttribute('data-is-dev') === 'true';
+        var devWarnings = [];
+        
+        try {
+          devWarnings = JSON.parse(script.getAttribute('data-dev-warnings') || '[]');
+        } catch (e) {}
 
-        // Read consent
+        // Log dev warnings
+        if (isDev && devWarnings.length > 0) {
+          devWarnings.forEach(function(warning) {
+            console.warn(warning);
+          });
+        }
+
+        // Read consent from cookie
         function getCookie(name) {
           var cookies = document.cookie.split(';');
           for (var i = 0; i < cookies.length; i++) {
@@ -74,6 +133,7 @@ const providerData = {
           return null;
         }
 
+        // Read consent from cookie or localStorage
         function readConsent(version) {
           // Try cookie first
           var cookieValue = getCookie(CONSENT_COOKIE);
@@ -102,16 +162,19 @@ const providerData = {
 
         var consent = readConsent(consentVersion);
 
-        // Only load analytics if user has given consent
+        // Only load analytics if user has given explicit consent
         if (!consent || consent.analytics !== true) {
+          if (isDev) {
+            console.log('[Analytics] Not loading: analytics consent not granted');
+          }
           return;
         }
 
-        // Load provider-specific scripts
+        // Inject external script
         function injectScript(src, attrs) {
           var s = document.createElement('script');
           s.src = src;
-          s.async = true;
+          s.defer = true;
           if (attrs) {
             for (var key in attrs) {
               if (attrs.hasOwnProperty(key)) {
@@ -120,41 +183,44 @@ const providerData = {
             }
           }
           document.head.appendChild(s);
+          if (isDev) {
+            console.log('[Analytics] Injected script:', src);
+          }
         }
 
+        // Inject inline script
         function injectInlineScript(code) {
           var s = document.createElement('script');
           s.textContent = code;
           document.head.appendChild(s);
+          if (isDev) {
+            console.log('[Analytics] Injected inline script');
+          }
         }
 
+        // Provider-specific script injection
         switch (provider) {
-          case 'cloudflare':
-            var cfToken = script.getAttribute('data-cloudflare-token');
-            if (cfToken) {
-              injectScript('https://static.cloudflareinsights.com/beacon.min.js', {
-                'data-cf-beacon': JSON.stringify({ token: cfToken })
-              });
-            }
-            break;
-
           case 'umami':
             var umamiWebsiteId = script.getAttribute('data-umami-website-id');
             var umamiScriptUrl = script.getAttribute('data-umami-script-url');
-            if (umamiWebsiteId && umamiScriptUrl) {
+            if (umamiWebsiteId) {
               injectScript(umamiScriptUrl, {
                 'data-website-id': umamiWebsiteId
               });
+            } else if (isDev) {
+              console.warn('[Analytics] Umami: websiteId is empty, skipping script injection');
             }
             break;
 
           case 'plausible':
             var plausibleDomain = script.getAttribute('data-plausible-domain');
-            var plausibleScriptUrl = script.getAttribute('data-plausible-script-url') || 'https://plausible.io/js/script.js';
+            var plausibleScriptUrl = script.getAttribute('data-plausible-script-url');
             if (plausibleDomain) {
               injectScript(plausibleScriptUrl, {
                 'data-domain': plausibleDomain
               });
+            } else if (isDev) {
+              console.warn('[Analytics] Plausible: domain is empty, skipping script injection');
             }
             break;
 
@@ -168,25 +234,47 @@ const providerData = {
               function gtag() { window.dataLayer.push(arguments); }
               gtag('js', new Date());
               gtag('config', ga4MeasurementId);
+              if (isDev) {
+                console.log('[Analytics] GA4 initialized with:', ga4MeasurementId);
+              }
+            } else if (isDev) {
+              console.warn('[Analytics] GA4: measurementId is empty, skipping script injection');
             }
             break;
 
           case 'custom':
-            var customScript = script.getAttribute('data-custom-script');
-            if (customScript) {
-              // Check if it's a URL or inline script
-              if (customScript.startsWith('http://') || customScript.startsWith('https://')) {
-                injectScript(customScript);
-              } else {
-                injectInlineScript(customScript);
-              }
+            var customScriptUrl = script.getAttribute('data-custom-script-url');
+            var customInline = script.getAttribute('data-custom-inline');
+            var hasCustomConfig = false;
+            
+            // Inject external script if provided
+            if (customScriptUrl) {
+              injectScript(customScriptUrl);
+              hasCustomConfig = true;
+            }
+            
+            // Inject inline script if provided
+            if (customInline) {
+              injectInlineScript(customInline);
+              hasCustomConfig = true;
+            }
+            
+            if (!hasCustomConfig && isDev) {
+              console.warn('[Analytics] Custom: neither scriptUrl nor inline provided, skipping');
             }
             break;
+            
+          default:
+            if (isDev) {
+              console.warn('[Analytics] Unknown provider:', provider);
+            }
         }
       } catch (e) {
-        // Fail silently
+        // Fail silently in production, log in dev
+        if (typeof isDev !== 'undefined' && isDev) {
+          console.error('[Analytics] Error:', e);
+        }
       }
     })();
   </script>
 )}
-

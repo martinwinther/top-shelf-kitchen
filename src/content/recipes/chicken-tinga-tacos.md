@@ -64,3 +64,4 @@ status: "published"
 Tinga keeps for 3 days and freezes well. Adjust chipotle amount to your heat preference—start with less if sensitive to spice.
 
 
+
