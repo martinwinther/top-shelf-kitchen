@@ -78,6 +78,13 @@ interface GiscusConfig {
   repoId: string;
   category: string;
   categoryId: string;
+  mapping?: 'pathname' | 'url' | 'title' | 'og:title' | 'specific';
+  strict?: boolean;
+  reactionsEnabled?: boolean;
+  emitMetadata?: boolean;
+  inputPosition?: 'top' | 'bottom';
+  theme?: string;
+  lang?: string;
 }
 
 interface CommentsConfig {
@@ -223,6 +230,13 @@ export const siteConfig: SiteConfig = {
         repoId: '', // from giscus.app setup
         category: '', // e.g., 'Announcements'
         categoryId: '', // from giscus.app setup
+        mapping: 'pathname',
+        strict: true,
+        reactionsEnabled: true,
+        emitMetadata: false,
+        inputPosition: 'bottom',
+        theme: 'noborder_dark', // Matches our dark glass aesthetic
+        lang: 'en',
       },
     },
 

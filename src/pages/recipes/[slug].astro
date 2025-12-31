@@ -13,6 +13,7 @@ import PrintButton from '../../components/recipes/PrintButton.astro';
 import ShareTools from '../../components/recipes/ShareTools.astro';
 import { RecipeIngredientsScaler } from '../../components/react/RecipeIngredientsScaler';
 import { CookingMode } from '../../components/react/CookingMode';
+import GiscusComments from '../../components/comments/GiscusComments.astro';
 
 export async function getStaticPaths() {
   const publishedRecipes = await getPublishedRecipes();
@@ -121,6 +122,10 @@ const ogImage = recipe.data.image;
     <div class="no-print">
       <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />
     </div>
+
+    {siteConfig.features.comments.enabled && (
+      <GiscusComments />
+    )}
 
     <nav class="recipe-navigation">
       <a href="/recipes" class="nav-link">Browse all recipes</a>
