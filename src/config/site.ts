@@ -93,11 +93,21 @@ interface CommentsConfig {
   giscus: GiscusConfig;
 }
 
+interface NewsletterEndpointConfig {
+  actionUrl: string;
+  method?: 'POST' | 'GET';
+  fieldName?: string;
+  hiddenFields?: Record<string, string>;
+}
+
 interface NewsletterConfig {
   enabled: boolean;
-  provider: 'mailchimp' | 'convertkit' | 'buttondown' | 'custom';
-  embedHtml?: string;
-  endpoint?: string;
+  provider: 'embed' | 'endpoint' | 'none';
+  title?: string;
+  description?: string;
+  embed?: { html: string };
+  endpoint?: NewsletterEndpointConfig;
+  showOnRecipes?: boolean;
 }
 
 interface SeoConfig {
@@ -242,9 +252,17 @@ export const siteConfig: SiteConfig = {
 
     newsletter: {
       enabled: false,
-      provider: 'buttondown',
-      embedHtml: '',
-      endpoint: '',
+      provider: 'none',
+      title: 'Stay in the loop',
+      description: 'New recipes, no fluff. Unsubscribe anytime.',
+      embed: { html: '' },
+      endpoint: {
+        actionUrl: '',
+        method: 'POST',
+        fieldName: 'email',
+        hiddenFields: {},
+      },
+      showOnRecipes: false,
     },
 
     // SEO features (enabled by default)

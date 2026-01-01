@@ -14,6 +14,7 @@ import ShareTools from '../../components/recipes/ShareTools.astro';
 import { RecipeIngredientsScaler } from '../../components/react/RecipeIngredientsScaler';
 import { CookingMode } from '../../components/react/CookingMode';
 import GiscusComments from '../../components/comments/GiscusComments.astro';
+import NewsletterSignup from '../../components/newsletter/NewsletterSignup.astro';
 
 export async function getStaticPaths() {
   const publishedRecipes = await getPublishedRecipes();
@@ -125,6 +126,10 @@ const ogImage = recipe.data.image;
 
     {siteConfig.features.comments.enabled && (
       <GiscusComments />
+    )}
+
+    {siteConfig.features.newsletter.showOnRecipes && (
+      <NewsletterSignup compact />
     )}
 
     <nav class="recipe-navigation">

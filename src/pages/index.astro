@@ -5,6 +5,7 @@ import { getPublishedRecipes, getTotalMinutes, pickFeatured, getRecipeSlug } fro
 import RecipeCard from '../components/recipes/RecipeCard.astro';
 import CategoryTile from '../components/home/CategoryTile.astro';
 import RecipeRail from '../components/home/RecipeRail.astro';
+import NewsletterSignup from '../components/newsletter/NewsletterSignup.astro';
 
 const allRecipes = await getPublishedRecipes();
 
@@ -112,6 +113,9 @@ const latestRecipes = allRecipes.slice(0, 6).map((recipe) => ({
         viewAllHref="/recipes"
       />
     )}
+
+    <!-- Newsletter Signup -->
+    <NewsletterSignup />
 
     <!-- Footer CTA -->
     <section class="home-section home-cta">
