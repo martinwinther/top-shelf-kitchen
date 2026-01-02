@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
  * Build script that runs Astro build and conditionally runs Pagefind indexing.
- * Gates Pagefind based on siteConfig.features.search.enabled in src/config/site.ts
+ * Gates Pagefind based on buildFlags.json (avoids brittle regex parsing of TypeScript).
+ * 
+ * NOTE: Keep src/config/buildFlags.json in sync with src/config/site.ts
  */
 
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,10 +15,25 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '..');
 
 /**
- * Check if search is enabled in site config
- * Uses regex to avoid TypeScript execution dependency
+ * Check if search is enabled using the build flags JSON file
+ * Falls back to regex parsing of site.ts if JSON file doesn't exist
  */
 function isSearchEnabled() {
+  const jsonPath = resolve(projectRoot, 'src/config/buildFlags.json');
+  
+  // Primary: Read from JSON file (stable, no parsing issues)
+  if (existsSync(jsonPath)) {
+    try {
+      const flags = JSON.parse(readFileSync(jsonPath, 'utf-8'));
+      if (flags?.search?.enabled !== undefined) {
+        return Boolean(flags.search.enabled);
+      }
+    } catch (error) {
+      console.warn('⚠ Could not parse buildFlags.json:', error.message);
+    }
+  }
+  
+  // Fallback: Parse site.ts with regex (legacy support)
   try {
     const configPath = resolve(projectRoot, 'src/config/site.ts');
     const configContent = readFileSync(configPath, 'utf-8');

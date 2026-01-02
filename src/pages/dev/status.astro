@@ -1,0 +1,348 @@
+---
+/**
+ * Dev Status Page - Diagnostics for template users
+ * 
+ * Displays enabled feature toggles, consent status, and Pagefind assets.
+ * Gated behind features.dev.showUiDemo (same as UI demo page).
+ */
+
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import GlassCard from '../../components/ui/GlassCard.astro';
+import { siteConfig } from '../../config/site';
+
+// Gate this route behind dev config
+if (!siteConfig.features.dev.showUiDemo) {
+  return Astro.redirect('/');
+}
+
+// Feature status list
+const featureStatus = [
+  { name: 'Search', enabled: siteConfig.features.search.enabled, provider: siteConfig.features.search.provider },
+  { name: 'Unit Toggle', enabled: siteConfig.features.unitToggle.enabled, default: siteConfig.features.unitToggle.default },
+  { name: 'Recipe Scaling', enabled: siteConfig.features.recipeScaling.enabled },
+  { name: 'Cooking Mode', enabled: siteConfig.features.cookingMode.enabled, keepAwake: siteConfig.features.cookingMode.keepAwake },
+  { name: 'Print', enabled: siteConfig.features.print.enabled },
+  { name: 'Share', enabled: siteConfig.features.share.enabled, socialLinks: siteConfig.features.share.socialLinks },
+  { name: 'Ads', enabled: siteConfig.features.ads.enabled, provider: siteConfig.features.ads.provider },
+  { name: 'Analytics', enabled: siteConfig.features.analytics.enabled, provider: siteConfig.features.analytics.provider },
+  { name: 'Comments', enabled: siteConfig.features.comments.enabled, provider: siteConfig.features.comments.provider },
+  { name: 'Newsletter', enabled: siteConfig.features.newsletter.enabled, provider: siteConfig.features.newsletter.provider },
+  { name: 'Consent Banner', enabled: siteConfig.features.legal.consentBanner },
+];
+
+const seoStatus = [
+  { name: 'Sitemap', enabled: siteConfig.features.seo.sitemap },
+  { name: 'Robots.txt', enabled: siteConfig.features.seo.robots },
+  { name: 'OG Images', enabled: siteConfig.features.seo.ogImages },
+  { name: 'Recipe JSON-LD', enabled: siteConfig.features.seo.jsonLdRecipe },
+];
+---
+
+<SiteLayout title="Dev Status">
+  <div class="page-content" data-pagefind-ignore>
+    <header class="page-header">
+      <h1>Dev Status</h1>
+      <p class="subtitle">Feature toggles and diagnostics</p>
+    </header>
+
+    <section class="section">
+      <h2 class="section-title">Site Info</h2>
+      <GlassCard>
+        <dl class="info-grid">
+          <dt>Site Name</dt>
+          <dd>{siteConfig.site.name}</dd>
+          <dt>URL</dt>
+          <dd><code>{siteConfig.site.url || '(not set)'}</code></dd>
+          <dt>Locale</dt>
+          <dd>{siteConfig.site.locale}</dd>
+          <dt>Consent Version</dt>
+          <dd>{siteConfig.features.legal.consentVersion}</dd>
+        </dl>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Feature Toggles</h2>
+      <GlassCard>
+        <ul class="feature-list">
+          {featureStatus.map((feature) => (
+            <li class="feature-item">
+              <span class:list={['status-badge', feature.enabled ? 'status-badge--on' : 'status-badge--off']}>
+                {feature.enabled ? '✓' : '✗'}
+              </span>
+              <span class="feature-name">{feature.name}</span>
+              {feature.provider && (
+                <span class="feature-detail">({feature.provider})</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">SEO Features</h2>
+      <GlassCard>
+        <ul class="feature-list">
+          {seoStatus.map((feature) => (
+            <li class="feature-item">
+              <span class:list={['status-badge', feature.enabled ? 'status-badge--on' : 'status-badge--off']}>
+                {feature.enabled ? '✓' : '✗'}
+              </span>
+              <span class="feature-name">{feature.name}</span>
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Client-Side Checks</h2>
+      <GlassCard>
+        <div class="client-checks">
+          <div class="check-item">
+            <span class="check-label">Consent Cookie:</span>
+            <span id="consent-status" class="check-value">Checking...</span>
+          </div>
+          <div class="check-item">
+            <span class="check-label">Pagefind Assets:</span>
+            <span id="pagefind-status" class="check-value">Checking...</span>
+          </div>
+          <div class="check-item">
+            <span class="check-label">LocalStorage:</span>
+            <span id="storage-status" class="check-value">Checking...</span>
+          </div>
+        </div>
+      </GlassCard>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Quick Links</h2>
+      <GlassCard>
+        <nav class="quick-links">
+          <a href="/dev/ui">UI Component Demo</a>
+          <a href="/recipes">Recipes</a>
+          <a href="/privacy">Privacy Policy</a>
+        </nav>
+      </GlassCard>
+    </section>
+  </div>
+</SiteLayout>
+
+<script>
+  (function() {
+    // Check consent cookie
+    const consentStatus = document.getElementById('consent-status');
+    if (consentStatus) {
+      try {
+        const cookies = document.cookie.split(';');
+        const consentCookie = cookies.find(c => c.trim().startsWith('tsk_consent='));
+        if (consentCookie) {
+          const value = decodeURIComponent(consentCookie.split('=')[1]);
+          const parsed = JSON.parse(value);
+          consentStatus.textContent = `v${parsed.version} - ads:${parsed.ads}, analytics:${parsed.analytics}`;
+          consentStatus.classList.add('check-value--ok');
+        } else {
+          consentStatus.textContent = 'Not set (banner will show)';
+          consentStatus.classList.add('check-value--warn');
+        }
+      } catch (e) {
+        consentStatus.textContent = 'Error reading consent';
+        consentStatus.classList.add('check-value--error');
+      }
+    }
+
+    // Check Pagefind assets
+    const pagefindStatus = document.getElementById('pagefind-status');
+    if (pagefindStatus) {
+      fetch('/pagefind/pagefind.js', { method: 'HEAD' })
+        .then((res) => {
+          if (res.ok) {
+            pagefindStatus.textContent = 'Found ✓';
+            pagefindStatus.classList.add('check-value--ok');
+          } else {
+            pagefindStatus.textContent = 'Not found (run npm run build)';
+            pagefindStatus.classList.add('check-value--warn');
+          }
+        })
+        .catch(() => {
+          pagefindStatus.textContent = 'Not found (run npm run build)';
+          pagefindStatus.classList.add('check-value--warn');
+        });
+    }
+
+    // Check localStorage
+    const storageStatus = document.getElementById('storage-status');
+    if (storageStatus) {
+      try {
+        localStorage.setItem('tsk.test', '1');
+        localStorage.removeItem('tsk.test');
+        storageStatus.textContent = 'Available ✓';
+        storageStatus.classList.add('check-value--ok');
+      } catch (e) {
+        storageStatus.textContent = 'Unavailable (private mode?)';
+        storageStatus.classList.add('check-value--warn');
+      }
+    }
+  })();
+</script>
+
+<style>
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    padding: 1rem 0 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.125rem;
+    margin-top: 0.5rem;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    margin: 0;
+  }
+
+  .info-grid dt {
+    font-weight: 500;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  .info-grid dd {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.875rem;
+  }
+
+  .info-grid code {
+    background: var(--glass-bg);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .feature-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .status-badge {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-badge--on {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+  }
+
+  .status-badge--off {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+
+  .feature-name {
+    color: var(--text);
+  }
+
+  .feature-detail {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .client-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .check-label {
+    color: var(--muted);
+    min-width: 140px;
+  }
+
+  .check-value {
+    color: var(--text);
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+  }
+
+  .check-value--ok {
+    color: #22c55e;
+  }
+
+  .check-value--warn {
+    color: #f59e0b;
+  }
+
+  .check-value--error {
+    color: #ef4444;
+  }
+
+  .quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .quick-links a {
+    color: var(--accent);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .quick-links a:hover {
+    text-decoration: underline;
+  }
+</style>
+

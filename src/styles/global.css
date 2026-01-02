@@ -218,8 +218,13 @@ button {
   .cooking-mode-entry,
   .back-link,
   .recipe-navigation,
+  .recipe-actions,
   .skip-link,
-  #consent-root {
+  .share-tools,
+  .search-modal-backdrop,
+  #consent-root,
+  #consent-banner,
+  #consent-modal {
     display: none !important;
   }
 

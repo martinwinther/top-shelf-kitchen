@@ -40,7 +40,12 @@ const formatCategory = (cat: string): string => {
 <header class="recipe-hero">
   {image && (
     <div class="recipe-hero-image">
-      <img src={image} alt={imageAlt || title} />
+      <img 
+        src={image} 
+        alt={imageAlt || title}
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   )}
 

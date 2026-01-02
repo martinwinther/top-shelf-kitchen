@@ -52,6 +52,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const openerRef = useRef<HTMLElement | null>(null);
 
   // Load Pagefind dynamically at runtime
   // Uses dynamic import via new Function to avoid Vite's static analysis
@@ -76,8 +77,10 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
   }, []);
 
   // Open modal
-  const openModal = useCallback(() => {
+  const openModal = useCallback((opener?: HTMLElement) => {
     if (!enabled) return;
+    // Store the opener element to return focus on close
+    openerRef.current = opener || document.activeElement as HTMLElement;
     setIsOpen(true);
     setQuery('');
     setResults([]);
@@ -92,6 +95,14 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
     setQuery('');
     setResults([]);
     setSelectedIndex(0);
+    // Return focus to the opener element
+    if (openerRef.current && typeof openerRef.current.focus === 'function') {
+      // Use setTimeout to ensure DOM updates complete first
+      setTimeout(() => {
+        openerRef.current?.focus();
+        openerRef.current = null;
+      }, 0);
+    }
   }, []);
 
   // Handle search
@@ -174,7 +185,9 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
   useEffect(() => {
     if (!enabled) return;
 
-    const handleTriggerClick = () => openModal();
+    const handleTriggerClick = (e: Event) => {
+      openModal(e.currentTarget as HTMLElement);
+    };
     const triggers = document.querySelectorAll('[data-search-trigger]');
     triggers.forEach((trigger) =>
       trigger.addEventListener('click', handleTriggerClick)

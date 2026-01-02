@@ -2,6 +2,27 @@ import { useEffect, useState } from 'react';
 import { buttonClasses } from '../ui/classes';
 import { convertIngredient, convertNote, formatAmount, type UnitSystem } from '../../lib/units';
 
+/**
+ * Hook to detect prefers-reduced-motion preference
+ */
+function usePrefersReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
 interface Ingredient {
   amount: number;
   unit?: string;
@@ -40,6 +61,7 @@ export function RecipeIngredientsScaler({
   // Initialize with baseServings to match server render (avoid hydration mismatch)
   const [servings, setServings] = useState<number>(baseServings);
   const [unitSystem, setUnitSystem] = useState<UnitSystem>(defaultUnitSystem);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Load from localStorage after mount (client-side only)
   useEffect(() => {
@@ -178,7 +200,7 @@ export function RecipeIngredientsScaler({
               <button
                 type="button"
                 onClick={() => handleUnitSystemChange('metric')}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium transition-all duration-150 rounded-md ${
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-md ${
                   unitSystem === 'metric'
                     ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
                     : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
@@ -190,7 +212,7 @@ export function RecipeIngredientsScaler({
               <button
                 type="button"
                 onClick={() => handleUnitSystemChange('us')}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium transition-all duration-150 rounded-md ${
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-md ${
                   unitSystem === 'us'
                     ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
                     : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'

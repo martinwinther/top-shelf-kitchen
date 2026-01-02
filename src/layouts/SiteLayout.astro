@@ -109,7 +109,7 @@ const currentYear = new Date().getFullYear();
 
     <div class="site-wrapper">
       <!-- Header -->
-      <header class="site-header">
+      <header class="site-header" data-pagefind-ignore>
         <div class="header-content">
           <a href="/" class="site-logo">
             {siteConfig.site.name}
@@ -152,7 +152,7 @@ const currentYear = new Date().getFullYear();
       </div>
 
       <!-- Footer -->
-      <footer class="site-footer">
+      <footer class="site-footer" data-pagefind-ignore>
         <div class="footer-content">
           <p class="footer-tagline">{siteConfig.site.tagline}</p>
           
@@ -340,6 +340,12 @@ const currentYear = new Date().getFullYear();
     color: var(--text) !important;
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
+    /* Accessibility: don't rely only on color for active state */
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent);
   }
 
   /* Main content area */

@@ -2,6 +2,27 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { buttonClasses } from '../ui/classes';
 import { convertIngredient, convertNote, formatAmount, type UnitSystem } from '../../lib/units';
 
+/**
+ * Hook to detect prefers-reduced-motion preference
+ */
+function usePrefersReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
 interface Ingredient {
   amount: number;
   unit?: string;
@@ -46,6 +67,7 @@ export function CookingMode({
   const [unitSystem, setUnitSystem] = useState<UnitSystem>(defaultUnitSystem);
   const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Load persisted state after mount
   useEffect(() => {
@@ -174,19 +196,30 @@ export function CookingMode({
     }
   }, [isOpen, wakeLock]);
 
-  // Lock body scroll when open
+  // Lock body scroll when open (with iOS Safari support)
   useEffect(() => {
     if (isOpen) {
+      // Store current scroll position
+      const scrollY = window.scrollY;
+      
+      // iOS Safari requires position:fixed + width:100% to prevent background scroll
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
       // Focus overlay for keyboard navigation
       overlayRef.current?.focus();
-    } else {
-      document.body.style.overflow = '';
+      
+      return () => {
+        // Restore scroll position on close
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   // Navigation handlers
@@ -355,7 +388,7 @@ export function CookingMode({
               <button
                 type="button"
                 onClick={() => setUnitSystem('metric')}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium transition-all duration-150 rounded-md ${
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-md ${
                   unitSystem === 'metric'
                     ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
                     : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
@@ -367,7 +400,7 @@ export function CookingMode({
               <button
                 type="button"
                 onClick={() => setUnitSystem('us')}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium transition-all duration-150 rounded-md ${
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-md ${
                   unitSystem === 'us'
                     ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
                     : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
@@ -446,7 +479,7 @@ export function CookingMode({
                       key={index}
                       type="button"
                       onClick={() => handleStepClick(index)}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-sm font-medium transition-all duration-150 ${
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-sm font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} ${
                         index === currentStep
                           ? 'bg-[color:var(--accent)] bg-opacity-20 text-[color:var(--accent)] border border-[color:var(--accent)] border-opacity-40'
                           : 'bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] text-[color:var(--muted)] hover:text-[color:var(--text)] hover:border-[rgba(255,255,255,0.18)]'
