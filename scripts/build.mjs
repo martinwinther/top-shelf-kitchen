@@ -29,7 +29,7 @@ function isSearchEnabled() {
         return Boolean(flags.search.enabled);
       }
     } catch (error) {
-      console.warn('⚠ Could not parse buildFlags.json:', error.message);
+      console.warn('WARNING: Could not parse buildFlags.json:', error.message);
     }
   }
   
@@ -48,10 +48,10 @@ function isSearchEnabled() {
       return searchBlockMatch[1] === 'true';
     }
     
-    console.warn('⚠ Could not find search config in site.ts, defaulting to enabled');
+    console.warn('WARNING: Could not find search config in site.ts, defaulting to enabled');
     return true;
   } catch (error) {
-    console.warn('⚠ Could not read site config, defaulting to search enabled');
+    console.warn('WARNING: Could not read site config, defaulting to search enabled');
     return true;
   }
 }
@@ -60,7 +60,7 @@ function isSearchEnabled() {
  * Run a command and stream output
  */
 function run(command, description) {
-  console.log(`\n▶ ${description}`);
+  console.log(`\n> ${description}`);
   console.log(`  Running: ${command}\n`);
   
   try {
@@ -71,13 +71,13 @@ function run(command, description) {
     });
     return true;
   } catch (error) {
-    console.error(`\n✗ Failed: ${description}`);
+    console.error(`\nERROR: Failed: ${description}`);
     process.exit(error.status || 1);
   }
 }
 
 // Main build process
-console.log('🏗 Top Shelf Kitchen Build\n');
+console.log('Top Shelf Kitchen Build\n');
 
 // Step 1: Run Astro build
 run('npx astro build', 'Building Astro site');
@@ -85,9 +85,9 @@ run('npx astro build', 'Building Astro site');
 // Step 2: Conditionally run Pagefind
 if (isSearchEnabled()) {
   run('npx pagefind --site dist', 'Indexing site with Pagefind');
-  console.log('\n✓ Build complete with search index');
+  console.log('\nBuild complete with search index');
 } else {
-  console.log('\n✓ Build complete (search disabled, skipping Pagefind)');
+  console.log('\nBuild complete (search disabled, skipping Pagefind)');
 }
 
 

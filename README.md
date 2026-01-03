@@ -338,7 +338,4 @@ The main layout is `src/layouts/SiteLayout.astro`. It includes:
 
 ## License
 
-<!-- TODO: Choose a license before publishing -->
-<!-- Recommended: MIT for open-source, or "All Rights Reserved" for commercial -->
-
 See [LICENSE](./LICENSE) for details.
