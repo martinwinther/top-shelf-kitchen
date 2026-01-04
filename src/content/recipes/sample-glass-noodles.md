@@ -41,6 +41,7 @@ tags:
   - "vegetarian"
   - "weeknight"
 status: "published"
+publishedAt: "2024-11-20"
 ---
 
 Serve immediately while hot. Works well as a side dish or add protein for a complete meal.

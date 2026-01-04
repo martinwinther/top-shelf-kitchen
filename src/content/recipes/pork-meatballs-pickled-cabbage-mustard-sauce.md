@@ -64,6 +64,7 @@ tags:
   - "dinner"
   - "comfort-food"
 status: "published"
+publishedAt: "2024-12-15"
 ---
 
 The pickled cabbage adds brightness and crunch. Leftovers keep well—meatballs reheat beautifully in the sauce.

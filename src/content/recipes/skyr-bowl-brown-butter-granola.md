@@ -48,6 +48,7 @@ tags:
   - "make-ahead"
   - "vegetarian"
 status: "published"
+publishedAt: "2024-11-28"
 ---
 
 Granola keeps for 2 weeks in an airtight container. Use any citrus you prefer—blood oranges work beautifully in season.

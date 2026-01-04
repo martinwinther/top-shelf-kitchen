@@ -57,6 +57,7 @@ tags:
   - "vegetarian"
   - "quick"
 status: "published"
+publishedAt: "2024-12-05"
 ---
 
 Chickpeas can be made ahead and stored in the fridge for 3 days. Reheat in a pan or oven before serving.

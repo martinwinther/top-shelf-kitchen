@@ -38,6 +38,7 @@ const recipeSchema = z.object({
 	steps: z.array(z.string()).min(1).describe('Cooking steps (array of strings)'),
 	tags: z.array(z.string()).optional().describe('Tags for categorization and search'),
 	status: z.enum(['draft', 'published']).describe('Publication status'),
+	publishedAt: z.coerce.date().describe('Publication date (ISO format: YYYY-MM-DD)'),
 });
 
 // Define recipes collection using glob loader

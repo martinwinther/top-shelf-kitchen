@@ -54,3 +54,11 @@ export function getRecipeSlug(recipe: RecipeEntry): string {
   return filename.replace(/\.mdx?$/, '');
 }
 
+/**
+ * Get publishedAt date from recipe entry
+ * Returns the date or a fallback date (epoch) if missing
+ */
+export function getPublishedAt(recipe: RecipeEntry): Date {
+  return recipe.data.publishedAt ?? new Date(0);
+}
+

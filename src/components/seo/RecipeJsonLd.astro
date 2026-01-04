@@ -26,6 +26,7 @@ interface Props {
     }>;
     steps: string[];
     image?: string;
+    publishedAt?: Date;
   };
   ogImagesEnabled: boolean;
 }
@@ -57,6 +58,11 @@ const jsonLd: Record<string, unknown> = {
     text: step,
   })),
 };
+
+// Add datePublished if available
+if (recipe.publishedAt) {
+  jsonLd.datePublished = recipe.publishedAt.toISOString();
+}
 
 // Add image if available and OG images are enabled
 if (recipe.image && ogImagesEnabled) {

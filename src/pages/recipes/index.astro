@@ -48,9 +48,10 @@ visibleRecipes = [...visibleRecipes].sort((a, b) => {
     return totalA - totalB;
   }
   
-  // Default: newest (keep current order for now)
-  // TODO: Add publishedAt field to recipe schema for proper date-based sorting
-  return 0;
+  // Default: newest (sort by publishedAt descending)
+  const dateA = a.data.publishedAt?.getTime() ?? 0;
+  const dateB = b.data.publishedAt?.getTime() ?? 0;
+  return dateB - dateA; // newest first
 });
 ---
 

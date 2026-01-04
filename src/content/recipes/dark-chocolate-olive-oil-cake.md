@@ -48,6 +48,7 @@ tags:
   - "vegetarian"
   - "make-ahead"
 status: "published"
+publishedAt: "2024-12-25"
 ---
 
 Best the day it's made, but keeps well wrapped for 2 days. A small slice is intensely satisfying—this cake is rich.

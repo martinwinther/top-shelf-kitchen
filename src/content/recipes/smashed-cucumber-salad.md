@@ -50,6 +50,7 @@ tags:
   - "vegetarian"
   - "no-cook"
 status: "published"
+publishedAt: "2024-12-10"
 ---
 
 Best eaten within a few hours. The smashing creates nooks and crannies that hold the dressing beautifully.

@@ -42,6 +42,7 @@ tags:
   - "vegetarian"
   - "quick"
 status: "published"
+publishedAt: "2024-12-21"
 ---
 
 Don't crowd the pan—mushrooms need space to brown properly. These are great hot or at room temperature.

@@ -35,9 +35,15 @@ const quickRecipes = [...allRecipes]
     servingsDefault: recipe.data.servingsDefault,
   }));
 
-// Latest recipes (top 6 in current order)
-// TODO: Switch to publishedAt field for proper date-based sorting
-const latestRecipes = allRecipes.slice(0, 6).map((recipe) => ({
+// Latest recipes (top 6 by publishedAt, newest first)
+const latestRecipes = [...allRecipes]
+  .sort((a, b) => {
+    const dateA = a.data.publishedAt?.getTime() ?? 0;
+    const dateB = b.data.publishedAt?.getTime() ?? 0;
+    return dateB - dateA; // newest first
+  })
+  .slice(0, 6)
+  .map((recipe) => ({
   title: recipe.data.title,
   description: recipe.data.description,
   href: `/recipes/${getRecipeSlug(recipe)}`,
