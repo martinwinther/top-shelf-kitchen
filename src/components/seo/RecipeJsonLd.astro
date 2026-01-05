@@ -5,6 +5,16 @@
 
 import { minutesToIso8601, formatIngredientForJsonLd } from '../../lib/seo';
 
+type ImageData =
+  | string
+  | {
+      src: string;
+      alt?: string;
+      width?: number;
+      height?: number;
+    }
+  | undefined;
+
 interface Props {
   siteUrl: string;
   slug: string;
@@ -25,7 +35,7 @@ interface Props {
       note?: string;
     }>;
     steps: string[];
-    image?: string;
+    image?: ImageData;
     publishedAt?: Date;
   };
   ogImagesEnabled: boolean;
@@ -66,10 +76,13 @@ if (recipe.publishedAt) {
 
 // Add image if available and OG images are enabled
 if (recipe.image && ogImagesEnabled) {
+  // Extract image src (handle both string and object formats)
+  const imageSrc = typeof recipe.image === 'string' ? recipe.image : recipe.image.src;
+  
   // If image is a relative path, make it absolute
-  const imageUrl = recipe.image.startsWith('http')
-    ? recipe.image
-    : `${siteUrl}${recipe.image.startsWith('/') ? '' : '/'}${recipe.image}`;
+  const imageUrl = imageSrc.startsWith('http')
+    ? imageSrc
+    : `${siteUrl}${imageSrc.startsWith('/') ? '' : '/'}${imageSrc}`;
   jsonLd.image = imageUrl;
 }
 ---

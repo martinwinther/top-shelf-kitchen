@@ -6,6 +6,16 @@
 import GlassCard from '../ui/GlassCard.astro';
 import Badge from '../ui/Badge.astro';
 
+type ImageData =
+  | string
+  | {
+      src: string;
+      alt?: string;
+      width?: number;
+      height?: number;
+    }
+  | undefined;
+
 interface Props {
   title: string;
   description: string;
@@ -14,7 +24,7 @@ interface Props {
   prepMinutes: number;
   cookMinutes: number;
   servingsDefault: number;
-  image?: string;
+  image?: ImageData;
   imageAlt?: string;
 }
 
@@ -35,16 +45,43 @@ const totalMinutes = prepMinutes + cookMinutes;
 const formatCategory = (cat: string): string => {
   return cat.charAt(0).toUpperCase() + cat.slice(1);
 };
+
+// Normalize image data to object format
+const normalizeImage = (
+  image: ImageData,
+  fallbackAlt?: string
+): { src: string; alt: string; width?: number; height?: number } | null => {
+  if (!image) return null;
+
+  if (typeof image === 'string') {
+    return {
+      src: image,
+      alt: fallbackAlt || title,
+    };
+  }
+
+  return {
+    src: image.src,
+    alt: image.alt || fallbackAlt || title,
+    width: image.width,
+    height: image.height,
+  };
+};
+
+const normalizedImage = normalizeImage(image, imageAlt);
 ---
 
 <header class="recipe-hero">
-  {image && (
+  {normalizedImage && (
     <div class="recipe-hero-image">
       <img 
-        src={image} 
-        alt={imageAlt || title}
+        src={normalizedImage.src} 
+        alt={normalizedImage.alt}
+        width={normalizedImage.width}
+        height={normalizedImage.height}
         loading="lazy"
         decoding="async"
+        style={normalizedImage.width && normalizedImage.height ? 'height: auto;' : undefined}
       />
     </div>
   )}

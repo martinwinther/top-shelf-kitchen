@@ -40,7 +40,12 @@ const title = recipe.data.title;
 const description = recipe.data.description;
 const canonicalPath = `/recipes/${slug}`;
 const canonicalUrl = `${siteConfig.site.url}${canonicalPath}`;
-const ogImage = recipe.data.image;
+// Extract image src for ogImage (handle both string and object formats)
+const ogImage = recipe.data.image
+  ? typeof recipe.data.image === 'string'
+    ? recipe.data.image
+    : recipe.data.image.src
+  : undefined;
 ---
 
 <SiteLayout

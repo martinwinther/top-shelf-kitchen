@@ -16,13 +16,26 @@ const ingredientSchema = z.object({
 	note: z.string().optional().describe('Optional note about the ingredient (e.g., "minced", "chopped")'),
 });
 
+// Image schema - supports both string (backwards compatible) and object (with dimensions)
+const imageSchema = z.union([
+	z.string().describe('Path to recipe image (legacy string format)'),
+	z
+		.object({
+			src: z.string().describe('Path to recipe image'),
+			alt: z.string().optional().describe('Alt text for recipe image'),
+			width: z.number().int().positive().optional().describe('Image width in pixels'),
+			height: z.number().int().positive().optional().describe('Image height in pixels'),
+		})
+		.describe('Recipe image with optional metadata'),
+]);
+
 // Recipe schema matching design doc requirements
 const recipeSchema = z.object({
 	title: z.string().describe('Recipe title'),
 	description: z.string().describe('Brief description/summary of the recipe'),
 	slug: z.string().optional().describe('URL slug (auto-generated from filename if not provided)'),
-	image: z.string().optional().describe('Path to recipe image'),
-	imageAlt: z.string().optional().describe('Alt text for recipe image'),
+	image: imageSchema.optional().describe('Recipe image (string path or object with src/alt/width/height)'),
+	imageAlt: z.string().optional().describe('Alt text for recipe image (legacy field, prefer image.alt)'),
 	category: z.enum(recipeCategories).describe('Recipe category'),
 	cuisine: z.string().describe('Cuisine type (e.g., "Danish", "Japanese", "Chinese")'),
 	servingsDefault: z.number().describe('Default number of servings (typically 4)'),
