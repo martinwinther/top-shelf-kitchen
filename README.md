@@ -99,7 +99,7 @@ site: {
 
 ### Build Flags
 
-The file `src/config/buildFlags.json` mirrors search configuration for the build script. This avoids brittle TypeScript parsing at build time.
+The file `src/config/buildFlags.json` is the **authoritative source** for build-time feature flags. The build script uses this file to determine whether to run Pagefind indexing, avoiding brittle TypeScript regex parsing.
 
 ```json
 {
@@ -107,7 +107,7 @@ The file `src/config/buildFlags.json` mirrors search configuration for the build
 }
 ```
 
-Keep this in sync with `site.ts` when changing search settings.
+**Important:** This file controls whether Pagefind indexing runs during build. The build script will warn if this file is missing and fall back to parsing `site.ts` (deprecated). Always keep `buildFlags.json` in sync with `site.ts` when changing search settings.
 
 ## Content
 
@@ -278,8 +278,10 @@ Search is powered by [Pagefind](https://pagefind.app/), a static search library.
 ### Disabling Search
 
 1. Set `features.search.enabled: false` in `src/config/site.ts`
-2. Set `search.enabled: false` in `src/config/buildFlags.json`
+2. Set `search.enabled: false` in `src/config/buildFlags.json` (this is the build-time gate)
 3. Build will skip Pagefind indexing
+
+**Note:** The build script reads `buildFlags.json` first. If the file is missing, it will warn and fall back to parsing `site.ts`, but this is deprecated. Always maintain `buildFlags.json` for reliable builds.
 
 ## Customization
 

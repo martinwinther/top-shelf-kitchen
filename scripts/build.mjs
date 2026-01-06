@@ -15,25 +15,32 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '..');
 
 /**
- * Check if search is enabled using the build flags JSON file
- * Falls back to regex parsing of site.ts if JSON file doesn't exist
+ * Check if search is enabled using buildFlags.json as the authoritative source.
+ * Falls back to regex parsing of site.ts only if JSON file is missing (with warning).
  */
 function isSearchEnabled() {
   const jsonPath = resolve(projectRoot, 'src/config/buildFlags.json');
   
-  // Primary: Read from JSON file (stable, no parsing issues)
+  // Primary: Read from JSON file (authoritative source)
   if (existsSync(jsonPath)) {
     try {
       const flags = JSON.parse(readFileSync(jsonPath, 'utf-8'));
       if (flags?.search?.enabled !== undefined) {
         return Boolean(flags.search.enabled);
       }
+      console.warn('WARNING: buildFlags.json exists but search.enabled is missing. Defaulting to enabled.');
+      return true;
     } catch (error) {
-      console.warn('WARNING: Could not parse buildFlags.json:', error.message);
+      console.error('ERROR: Could not parse buildFlags.json:', error.message);
+      console.error('Please fix buildFlags.json or remove it to use fallback.');
+      process.exit(1);
     }
   }
   
-  // Fallback: Parse site.ts with regex (legacy support)
+  // Fallback: Parse site.ts with regex (legacy support, deprecated)
+  console.warn('WARNING: buildFlags.json not found. Using fallback regex parsing of site.ts.');
+  console.warn('This is deprecated. Create src/config/buildFlags.json for stable build gating.');
+  
   try {
     const configPath = resolve(projectRoot, 'src/config/site.ts');
     const configContent = readFileSync(configPath, 'utf-8');

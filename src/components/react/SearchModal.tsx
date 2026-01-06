@@ -53,27 +53,86 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const openerRef = useRef<HTMLElement | null>(null);
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
 
-  // Load Pagefind dynamically at runtime
-  // Uses dynamic import via new Function to avoid Vite's static analysis
+  // Load Pagefind via script tag injection (more reliable than dynamic import)
   const loadPagefind = useCallback(async () => {
     if (window.pagefind) {
       setPagefindLoaded(true);
       return;
     }
 
-    try {
-      // Dynamic import that bypasses Vite's static analysis
-      const importPagefind = new Function(
-        'return import("/pagefind/pagefind.js")'
-      ) as () => Promise<PagefindAPI>;
-      
-      const pagefind = await importPagefind();
-      window.pagefind = pagefind;
-      setPagefindLoaded(true);
-    } catch {
-      setError('Search is not available. Try rebuilding the site.');
+    // Check if script is already loading
+    if (scriptRef.current) {
+      // Wait for existing script to load
+      return new Promise<void>((resolve) => {
+        const checkInterval = setInterval(() => {
+          if (window.pagefind) {
+            clearInterval(checkInterval);
+            setPagefindLoaded(true);
+            resolve();
+          }
+        }, 50);
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          resolve();
+        }, 5000);
+      });
     }
+
+    // First, verify the script exists
+    try {
+      const response = await fetch('/pagefind/pagefind.js', { method: 'HEAD' });
+      if (!response.ok) {
+        setError('Search index not found. Run build with search enabled.');
+        return;
+      }
+    } catch {
+      setError('Search index not found. Run build with search enabled.');
+      return;
+    }
+
+    // Inject script tag
+    const script = document.createElement('script');
+    script.src = '/pagefind/pagefind.js';
+    script.type = 'module';
+    script.async = true;
+    scriptRef.current = script;
+
+    script.onload = () => {
+      // Pagefind exposes itself on window after loading
+      if (window.pagefind) {
+        setPagefindLoaded(true);
+      } else {
+        // Wait a bit for Pagefind to initialize
+        setTimeout(() => {
+          if (window.pagefind) {
+            setPagefindLoaded(true);
+          } else {
+            setError('Search failed to initialize. Please refresh the page.');
+          }
+        }, 100);
+      }
+    };
+
+    script.onerror = () => {
+      setError('Search index not found. Run build with search enabled.');
+      scriptRef.current = null;
+    };
+
+    document.head.appendChild(script);
+  }, []);
+
+  // Cleanup script tag on unmount (only if Pagefind failed to load)
+  useEffect(() => {
+    return () => {
+      // Only remove script if it failed to load (error state)
+      // If Pagefind loaded successfully, keep the script for reuse
+      if (scriptRef.current && !window.pagefind) {
+        scriptRef.current.remove();
+        scriptRef.current = null;
+      }
+    };
   }, []);
 
   // Open modal
@@ -200,10 +259,13 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
     };
   }, [enabled, openModal]);
 
-  // Focus input when modal opens
+  // Focus input when modal opens (use requestAnimationFrame for reliable focus)
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+      // Use requestAnimationFrame to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
     }
   }, [isOpen]);
 
@@ -224,6 +286,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
         break;
       case 'Enter':
+        event.preventDefault();
         if (results[selectedIndex]) {
           window.location.href = results[selectedIndex].url;
         }
@@ -248,6 +311,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
       role="dialog"
       aria-modal="true"
       aria-label={`Search ${siteName}`}
+      data-pagefind-ignore
     >
       <div className="search-modal">
         <div className="search-header">
@@ -340,7 +404,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
         .search-modal-backdrop {
           position: fixed;
           inset: 0;
-          z-index: 1000;
+          z-index: 10000;
           display: flex;
           align-items: flex-start;
           justify-content: center;
