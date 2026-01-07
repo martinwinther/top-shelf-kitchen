@@ -2,7 +2,7 @@
 title: "Smashed Cucumber Salad with Garlic, Black Vinegar, Chili Oil"
 description: "Classic Chinese smashed cucumber salad. Crunchy, tangy, spicy—the perfect side or light lunch."
 image:
-  src: "https://images.unsplash.com/photo-1623428187969-5da2dbe24e69?w=800&q=80"
+  src: "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=800&q=80"
   alt: "Smashed cucumber salad with chili oil"
 category: "lunch"
 cuisine: "Chinese"

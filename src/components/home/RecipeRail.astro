@@ -5,6 +5,16 @@
 
 import RecipeCard from '../recipes/RecipeCard.astro';
 
+type ImageData =
+  | string
+  | {
+      src: string;
+      alt?: string;
+      width?: number;
+      height?: number;
+    }
+  | undefined;
+
 interface Props {
   title: string;
   recipes: Array<{
@@ -16,6 +26,8 @@ interface Props {
     prepMinutes: number;
     cookMinutes: number;
     servingsDefault: number;
+    image?: ImageData;
+    imageAlt?: string;
   }>;
   viewAllHref?: string;
 }
@@ -46,6 +58,8 @@ const { title, recipes, viewAllHref } = Astro.props;
             prepMinutes={recipe.prepMinutes}
             cookMinutes={recipe.cookMinutes}
             servingsDefault={recipe.servingsDefault}
+            image={recipe.image}
+            imageAlt={recipe.imageAlt}
           />
         </div>
       ))}
