@@ -1,6 +1,9 @@
 ---
 title: "Crispy Chili Chickpea Wrap with Lemon-Tahini"
 description: "Spiced, crispy chickpeas wrapped in a warm tortilla with tahini sauce. Fast, filling, and full of flavor."
+image:
+  src: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=800&q=80"
+  alt: "Crispy chickpea wrap with tahini drizzle"
 category: "lunch"
 cuisine: "Mediterranean"
 servingsDefault: 4
@@ -59,6 +62,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-05"
 ---
+
+![Crispy roasted chickpeas on a baking sheet](https://images.unsplash.com/photo-1515543904604-2b61a4ac5b8b?w=600&q=80)
 
 Chickpeas can be made ahead and stored in the fridge for 3 days. Reheat in a pan or oven before serving.
 

@@ -1,6 +1,9 @@
 ---
 title: "Skyr Bowl with Brown Butter Granola + Citrus"
 description: "Creamy Icelandic skyr topped with nutty brown butter granola and bright citrus segments. A breakfast that feels like dessert."
+image:
+  src: "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=800&q=80"
+  alt: "Yogurt bowl with granola and fresh fruit"
 category: "breakfast"
 cuisine: "Danish"
 servingsDefault: 4
@@ -50,6 +53,8 @@ tags:
 status: "published"
 publishedAt: "2024-11-28"
 ---
+
+![Brown butter granola spread on a baking sheet](https://images.unsplash.com/photo-1517093728432-a0440f8d45af?w=600&q=80)
 
 Granola keeps for 2 weeks in an airtight container. Use any citrus you prefer—blood oranges work beautifully in season.
 

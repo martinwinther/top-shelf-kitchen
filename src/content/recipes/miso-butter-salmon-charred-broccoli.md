@@ -1,6 +1,9 @@
 ---
 title: "Miso-Butter Salmon with Charred Broccoli"
 description: "Salmon glazed with miso butter, served with charred broccoli. Rich, umami-forward, and ready in 20 minutes."
+image:
+  src: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80"
+  alt: "Miso glazed salmon with charred broccoli"
 category: "dinner"
 cuisine: "Japanese"
 servingsDefault: 4
@@ -49,6 +52,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-27"
 ---
+
+![Salmon being brushed with miso butter glaze](https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&q=80)
 
 Don't overcook the salmon—it should still be slightly pink in the center. The miso butter will caramelize beautifully in the oven.
 

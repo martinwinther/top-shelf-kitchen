@@ -1,6 +1,9 @@
 ---
 title: "One-Pan Chicken Tinga Tacos (No-Fuss)"
 description: "Smoky, spicy chicken tinga made in one pan. Shredded chicken in a chipotle-tomato sauce, perfect for tacos."
+image:
+  src: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80"
+  alt: "Chicken tinga tacos with fresh garnish"
 category: "dinner"
 cuisine: "Mexican"
 servingsDefault: 4
@@ -61,6 +64,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-29"
 ---
+
+![Shredded chicken tinga in a pan with tomato sauce](https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&q=80)
 
 Tinga keeps for 3 days and freezes well. Adjust chipotle amount to your heat preference—start with less if sensitive to spice.
 

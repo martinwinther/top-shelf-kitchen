@@ -1,6 +1,9 @@
 ---
 title: "Dark Chocolate Olive Oil Cake (Small, Intense)"
 description: "Rich, dense chocolate cake made with olive oil. No butter, no fuss—just deep chocolate flavor in a small, satisfying portion."
+image:
+  src: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80"
+  alt: "Dark chocolate olive oil cake slice"
 category: "dessert"
 cuisine: "Italian"
 servingsDefault: 4
@@ -50,6 +53,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-25"
 ---
+
+![Rich chocolate cake batter being folded](https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&q=80)
 
 Best the day it's made, but keeps well wrapped for 2 days. A small slice is intensely satisfying—this cake is rich.
 

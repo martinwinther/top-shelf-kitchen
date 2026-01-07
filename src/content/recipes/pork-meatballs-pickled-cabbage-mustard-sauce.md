@@ -1,6 +1,9 @@
 ---
 title: "Pork Meatballs with Pickled Cabbage + Mustard Pan Sauce"
 description: "Tender pork meatballs with quick-pickled cabbage and a tangy mustard pan sauce. Comforting Danish-inspired comfort food."
+image:
+  src: "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=800&q=80"
+  alt: "Pork meatballs with mustard sauce"
 category: "dinner"
 cuisine: "Danish"
 servingsDefault: 4
@@ -66,6 +69,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-15"
 ---
+
+![Meatballs browning in a pan with sauce](https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=600&q=80)
 
 The pickled cabbage adds brightness and crunch. Leftovers keep well—meatballs reheat beautifully in the sauce.
 

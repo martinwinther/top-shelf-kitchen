@@ -1,5 +1,5 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { getPublishedRecipes, getRecipeSlug } from '../../lib/recipes';
 import { siteConfig } from '../../config/site';
@@ -34,6 +34,8 @@ interface Props {
 
 const { recipe } = Astro.props;
 const slug = getRecipeSlug(recipe);
+// Get rendered content from the entry
+const { Content } = await render(recipe);
 
 // SEO metadata
 const title = recipe.data.title;
@@ -125,6 +127,14 @@ const ogImage = recipe.data.image
 
     <StepList steps={recipe.data.steps} />
 
+    <section class="recipe-notes">
+      <GlassCard>
+        <div class="recipe-notes-content">
+          <Content />
+        </div>
+      </GlassCard>
+    </section>
+
     <div class="no-print">
       <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />
     </div>
@@ -196,6 +206,12 @@ const ogImage = recipe.data.image
 
   .recipe-notes-content :global(p:last-child) {
     margin-bottom: 0;
+  }
+
+  .recipe-notes-content :global(img) {
+    width: 100%;
+    border-radius: var(--radius-xl);
+    margin: 1rem 0;
   }
 
   .recipe-navigation {

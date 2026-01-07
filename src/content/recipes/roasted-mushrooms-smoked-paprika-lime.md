@@ -1,6 +1,9 @@
 ---
 title: "Roasted Mushrooms with Smoked Paprika + Lime"
 description: "Meaty roasted mushrooms with smoky paprika and bright lime. Perfect as a snack, side, or light meal."
+image:
+  src: "https://images.unsplash.com/photo-1504545102780-26774c1bb073?w=800&q=80"
+  alt: "Roasted mushrooms with herbs"
 category: "snacks"
 cuisine: "Global"
 servingsDefault: 4
@@ -44,6 +47,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-21"
 ---
+
+![Mushrooms roasting on a baking sheet](https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?w=600&q=80)
 
 Don't crowd the pan—mushrooms need space to brown properly. These are great hot or at room temperature.
 

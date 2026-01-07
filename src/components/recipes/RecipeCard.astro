@@ -9,6 +9,16 @@
 import GlassCard from '../ui/GlassCard.astro';
 import Badge from '../ui/Badge.astro';
 
+type ImageData =
+  | string
+  | {
+      src: string;
+      alt?: string;
+      width?: number;
+      height?: number;
+    }
+  | undefined;
+
 interface Props {
   title: string;
   description: string;
@@ -18,6 +28,8 @@ interface Props {
   prepMinutes: number;
   cookMinutes: number;
   servingsDefault: number;
+  image?: ImageData;
+  imageAlt?: string;
 }
 
 const {
@@ -29,7 +41,22 @@ const {
   prepMinutes,
   cookMinutes,
   servingsDefault,
+  image,
+  imageAlt,
 } = Astro.props;
+
+const normalizeImage = (
+  img: ImageData,
+  fallbackAlt?: string
+): { src: string; alt: string } | null => {
+  if (!img) return null;
+  if (typeof img === 'string') {
+    return { src: img, alt: fallbackAlt || title };
+  }
+  return { src: img.src, alt: img.alt || fallbackAlt || title };
+};
+
+const normalizedImage = normalizeImage(image, imageAlt);
 
 const totalMinutes = prepMinutes + cookMinutes;
 
@@ -40,6 +67,16 @@ const formatCategory = (cat: string): string => {
 
 <a href={href} class="recipe-card-link">
   <GlassCard hover>
+    {normalizedImage && (
+      <div class="recipe-card-image">
+        <img 
+          src={normalizedImage.src} 
+          alt={normalizedImage.alt}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    )}
     <div class="recipe-card-content">
       <h3 class="recipe-card-title">{title}</h3>
       <p class="recipe-card-description">{description}</p>
@@ -76,6 +113,19 @@ const formatCategory = (cat: string): string => {
     display: block;
     text-decoration: none;
     color: inherit;
+  }
+
+  .recipe-card-image {
+    margin: -1.5rem -1.5rem 1rem -1.5rem;
+    overflow: hidden;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .recipe-card-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
   }
 
   .recipe-card-content {

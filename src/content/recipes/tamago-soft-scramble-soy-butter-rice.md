@@ -1,6 +1,9 @@
 ---
 title: "Tamago-Style Soft Scramble with Soy-Butter Rice"
 description: "Japanese-style creamy scrambled eggs over steamed rice with soy butter. Simple, comforting, perfect for breakfast or a light meal."
+image:
+  src: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80"
+  alt: "Soft scrambled eggs on rice"
 category: "breakfast"
 cuisine: "Japanese"
 servingsDefault: 4
@@ -47,6 +50,8 @@ tags:
 status: "published"
 publishedAt: "2024-12-23"
 ---
+
+![Creamy soft scrambled eggs in a pan](https://images.unsplash.com/photo-1482049016530-d79f7d6aa2c1?w=600&q=80)
 
 The key is low heat and constant stirring. Remove from heat just before eggs look fully set—they'll finish cooking from residual heat.
 
