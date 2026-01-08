@@ -15,6 +15,7 @@ import { RecipeIngredientsScaler } from '../../components/react/RecipeIngredient
 import { CookingMode } from '../../components/react/CookingMode';
 import GiscusComments from '../../components/comments/GiscusComments.astro';
 import NewsletterSignup from '../../components/newsletter/NewsletterSignup.astro';
+import { ctaPillClasses } from '../../components/ui/classes';
 
 export async function getStaticPaths() {
   const publishedRecipes = await getPublishedRecipes();
@@ -148,12 +149,42 @@ const ogImage = recipe.data.image
     )}
 
     <nav class="recipe-navigation">
-      <a href="/recipes" class="nav-link">Browse all recipes</a>
+      <a href="/recipes" class={ctaPillClasses({ size: 'sm' })}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"></path>
+        </svg>
+        Browse all recipes
+      </a>
       <a
         href={`/recipes?category=${recipe.data.category}`}
-        class="nav-link"
+        class={ctaPillClasses({ size: 'sm' })}
       >
-        More {recipe.data.category} recipes →
+        More {recipe.data.category} recipes
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7"></path>
+        </svg>
       </a>
     </nav>
   </article>
@@ -220,23 +251,14 @@ const ogImage = recipe.data.image
     gap: 1rem;
     padding-top: 2rem;
     border-top: 1px solid var(--glass-border);
-  }
-
-  .nav-link {
-    font-size: 1rem;
-    color: var(--accent);
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .nav-link:hover {
-    opacity: 0.8;
+    align-items: flex-start;
   }
 
   @media (min-width: 640px) {
     .recipe-navigation {
       flex-direction: row;
       justify-content: space-between;
+      align-items: center;
     }
   }
 </style>

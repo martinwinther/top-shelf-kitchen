@@ -75,6 +75,46 @@ export function buttonClasses({
 }
 
 /**
+ * CTA Pill Button class generator
+ * Returns Tailwind class strings for Apple-style pill CTA buttons
+ */
+export function ctaPillClasses({
+  size = 'md',
+}: {
+  size?: 'sm' | 'md' | 'lg';
+} = {}): string {
+  const base = [
+    'inline-flex',
+    'items-center',
+    'justify-center',
+    'font-medium',
+    'transition-all',
+    'duration-150',
+    'rounded-full',
+    'bg-[color:var(--glass-bg)]',
+    'border',
+    'border-[color:var(--glass-border)]',
+    'text-[color:var(--text)]',
+    'hover:bg-[rgba(255,255,255,0.1)]',
+    'hover:border-[rgba(255,255,255,0.18)]',
+    'active:scale-[0.98]',
+    'focus-visible:outline',
+    'focus-visible:outline-2',
+    'focus-visible:outline-offset-2',
+    'focus-visible:outline-[color:var(--accent)]',
+    'no-underline',
+  ];
+
+  const sizes = {
+    sm: ['text-sm', 'px-4', 'py-1.5', 'gap-2'],
+    md: ['text-base', 'px-5', 'py-2', 'gap-2'],
+    lg: ['text-lg', 'px-6', 'py-2.5', 'gap-2.5'],
+  };
+
+  return cx(...base, ...sizes[size]);
+}
+
+/**
  * Badge class generator
  * Returns Tailwind class strings for badge styling
  */
