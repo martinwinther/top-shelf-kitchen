@@ -196,30 +196,32 @@ export function RecipeIngredientsScaler({
             </div>
           )}
           {unitToggleEnabled && (
-            <div className="flex items-center gap-1 bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg p-0.5">
+            <div className="inline-flex items-center bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-full p-0.5">
               <button
                 type="button"
                 onClick={() => handleUnitSystemChange('metric')}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-md ${
+                className={`px-3 py-1 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-full ${
                   unitSystem === 'metric'
-                    ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
+                    ? 'bg-[color:var(--accent)] text-[color:var(--bg)]'
                     : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
                 }`}
                 aria-label="Use metric units"
+                aria-pressed={unitSystem === 'metric'}
               >
-                Metric
+                g
               </button>
               <button
                 type="button"
                 onClick={() => handleUnitSystemChange('us')}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-md ${
+                className={`px-3 py-1 text-xs uppercase tracking-wider font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} rounded-full ${
                   unitSystem === 'us'
-                    ? 'bg-[color:var(--accent)] bg-opacity-15 text-[color:var(--accent)]'
+                    ? 'bg-[color:var(--accent)] text-[color:var(--bg)]'
                     : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'
                 }`}
                 aria-label="Use US units"
+                aria-pressed={unitSystem === 'us'}
               >
-                US
+                oz
               </button>
             </div>
           )}
