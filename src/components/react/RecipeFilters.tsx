@@ -71,7 +71,7 @@ export function RecipeFilters({ categories, cuisines }: RecipeFiltersProps) {
             id="filter-category"
             value={category}
             onChange={handleCategoryChange}
-            className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-[0.9375rem] px-3 py-2 cursor-pointer transition-all duration-200 font-inherit hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_rgba(255,107,53,0.2)]"
+            className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-[0.9375rem] px-3 py-2 cursor-pointer transition-all duration-200 font-inherit hover:bg-[color:var(--glass-bg-hover)] hover:border-[color:var(--glass-border-hover)] focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_var(--accent-muted)]"
           >
             <option value="">All</option>
             {categories.map((cat) => (
@@ -93,7 +93,7 @@ export function RecipeFilters({ categories, cuisines }: RecipeFiltersProps) {
             id="filter-cuisine"
             value={cuisine}
             onChange={handleCuisineChange}
-            className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-[0.9375rem] px-3 py-2 cursor-pointer transition-all duration-200 font-inherit hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_rgba(255,107,53,0.2)]"
+            className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-[0.9375rem] px-3 py-2 cursor-pointer transition-all duration-200 font-inherit hover:bg-[color:var(--glass-bg-hover)] hover:border-[color:var(--glass-border-hover)] focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_var(--accent-muted)]"
           >
             <option value="">All</option>
             {cuisines.map((cui) => (
@@ -115,7 +115,7 @@ export function RecipeFilters({ categories, cuisines }: RecipeFiltersProps) {
             id="filter-sort"
             value={sort}
             onChange={handleSortChange}
-            className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-[0.9375rem] px-3 py-2 cursor-pointer transition-all duration-200 font-inherit hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_rgba(255,107,53,0.2)]"
+            className="bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] rounded-lg text-[color:var(--text)] text-[0.9375rem] px-3 py-2 cursor-pointer transition-all duration-200 font-inherit hover:bg-[color:var(--glass-bg-hover)] hover:border-[color:var(--glass-border-hover)] focus:outline-none focus:border-[color:var(--accent)] focus:shadow-[0_0_0_2px_var(--accent-muted)]"
           >
             <option value="newest">Newest</option>
             <option value="title">Title</option>

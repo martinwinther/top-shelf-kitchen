@@ -11,6 +11,14 @@ Single source of truth: `src/config/site.ts`
 
 ## Feature toggles (v0)
 features:
+- theme:
+  - enabled: true (shows theme toggle in header)
+  - default: "dark" (default theme: "dark" | "light" | "system")
+  - allowSystem: true (allow "system" option that follows OS preference)
+  - localStorage key: `tsk.theme` (stores "dark" | "light" | "system")
+
+  When disabled, the site uses the default theme without toggle and without client-side theme persistence.
+
 - search: { enabled: true, provider: "pagefind" }
 - recipeScaling: { enabled: true }
 - unitToggle: { enabled: true, default: "metric" }

@@ -484,7 +484,7 @@ export function CookingMode({
                       className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-sm font-medium ${prefersReducedMotion ? '' : 'transition-all duration-150'} ${
                         index === currentStep
                           ? 'bg-[color:var(--accent)] bg-opacity-20 text-[color:var(--accent)] border border-[color:var(--accent)] border-opacity-40'
-                          : 'bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] text-[color:var(--muted)] hover:text-[color:var(--text)] hover:border-[rgba(255,255,255,0.18)]'
+                          : 'bg-[color:var(--glass-bg)] border border-[color:var(--glass-border)] text-[color:var(--muted)] hover:text-[color:var(--text)] hover:border-[color:var(--glass-border-hover)]'
                       }`}
                       aria-label={`Go to step ${index + 1}`}
                       aria-current={index === currentStep ? 'step' : undefined}

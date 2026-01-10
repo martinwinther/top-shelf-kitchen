@@ -7,29 +7,83 @@
  */
 
 :root {
-  /* Base colors */
+  /* Base colors (dark theme - default) */
   --bg: #0a0a0b;
   --bg-gradient: linear-gradient(135deg, #0a0a0b 0%, #12121a 50%, #0a0a0b 100%);
   --text: #f5f5f7;
+  --text-secondary: #d1d1d6;
   --muted: #8e8e93;
 
   /* Glass effect tokens */
   --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-hover: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-hover: rgba(255, 255, 255, 0.18);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --glass-glow: 0 0 20px rgba(255, 107, 53, 0.1);
+
+  /* Overlay */
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --modal-backdrop: rgba(0, 0, 0, 0.75);
 
   /* Accent color */
   --accent: #ff6b35;
   --accent-muted: rgba(255, 107, 53, 0.15);
+  --accent-text: var(--bg);
+
+  /* Interactive states */
+  --focus-ring: var(--accent);
+  --error: #ef4444;
+
+  /* Noise opacity */
+  --noise-opacity: 0.02;
 
   /* Radius */
   --radius-xl: 1.5rem;
   --radius-md: 0.75rem;
 }
 
+/* Light theme - Apple Liquid Glass aesthetic */
+html[data-theme="light"] {
+  /* Warm neutral background - not pure white */
+  --bg: #f8f7f4;
+  --bg-gradient: linear-gradient(135deg, #f8f7f4 0%, #f0efe9 50%, #f8f7f4 100%);
+  --text: #1d1d1f;
+  --text-secondary: #3d3d3f;
+  --muted: #6e6e73;
+
+  /* Light glass - subtle translucency with soft shadows */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-bg-hover: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-hover: rgba(0, 0, 0, 0.12);
+  --glass-shadow: 0 2px 16px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --glass-glow: 0 0 20px rgba(255, 107, 53, 0.08);
+
+  /* Overlay - lighter backdrop */
+  --overlay-bg: rgba(255, 255, 255, 0.85);
+  --modal-backdrop: rgba(0, 0, 0, 0.4);
+
+  /* Accent - slightly warmer in light mode */
+  --accent: #e85d2d;
+  --accent-muted: rgba(232, 93, 45, 0.12);
+  --accent-text: #ffffff;
+
+  /* Interactive states */
+  --focus-ring: var(--accent);
+  --error: #dc2626;
+
+  /* Subtle noise in light mode */
+  --noise-opacity: 0.015;
+}
+
 /* Global base styles */
 html {
   color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
@@ -58,7 +112,7 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.02;
+  opacity: var(--noise-opacity);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   z-index: -1;
 }

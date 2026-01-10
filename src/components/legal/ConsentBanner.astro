@@ -433,7 +433,7 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
 
   .consent-btn--primary {
     background: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     border-color: var(--accent);
   }
 
@@ -447,8 +447,8 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
   }
 
   .consent-btn--secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
   }
 
   /* Modal */
@@ -463,7 +463,7 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
   }
 
   .consent-modal::backdrop {
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--modal-backdrop);
     backdrop-filter: blur(6px);
   }
 
@@ -480,7 +480,7 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
-    box-shadow: var(--glass-shadow), 0 24px 64px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--glass-shadow), 0 24px 64px var(--modal-backdrop);
     max-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -551,7 +551,7 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 0.75rem;
     gap: 1rem;
@@ -592,7 +592,7 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
     display: block;
     width: 2.75rem;
     height: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg-hover);
     border: 1px solid var(--glass-border);
     border-radius: 9999px;
     position: relative;

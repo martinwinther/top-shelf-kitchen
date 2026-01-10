@@ -409,7 +409,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
           align-items: flex-start;
           justify-content: center;
           padding: 10vh 1rem 1rem;
-          background: rgba(0, 0, 0, 0.7);
+          background: var(--modal-backdrop);
           backdrop-filter: blur(4px);
           -webkit-backdrop-filter: blur(4px);
           animation: fadeIn 0.15s ease;
@@ -428,7 +428,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
           -webkit-backdrop-filter: blur(20px);
           border: 1px solid var(--glass-border);
           border-radius: var(--radius-xl);
-          box-shadow: var(--glass-shadow), 0 0 80px rgba(255, 107, 53, 0.1);
+          box-shadow: var(--glass-shadow), var(--glass-glow);
           overflow: hidden;
           animation: slideUp 0.2s ease;
         }
@@ -529,7 +529,7 @@ export function SearchModal({ siteName, enabled }: SearchModalProps) {
         }
 
         .search-error {
-          color: #ef4444;
+          color: var(--error);
         }
 
         .search-hint p {

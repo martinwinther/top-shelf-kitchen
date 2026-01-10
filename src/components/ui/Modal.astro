@@ -145,7 +145,7 @@ const modalId = id;
   }
 
   .modal::backdrop {
-    background: rgba(0, 0, 0, 0.75);
+    background: var(--modal-backdrop);
     backdrop-filter: blur(4px);
   }
 
@@ -162,7 +162,7 @@ const modalId = id;
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
-    box-shadow: var(--glass-shadow), 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--glass-shadow), 0 20px 60px var(--modal-backdrop);
     max-height: 90vh;
     display: flex;
     flex-direction: column;

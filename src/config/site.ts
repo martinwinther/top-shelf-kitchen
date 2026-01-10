@@ -132,7 +132,14 @@ interface DevConfig {
   showUiDemo: boolean;
 }
 
+interface ThemeConfig {
+  enabled: boolean;
+  default: 'dark' | 'light' | 'system';
+  allowSystem: boolean;
+}
+
 interface FeaturesConfig {
+  theme: ThemeConfig;
   search: SearchConfig;
   unitToggle: UnitToggleConfig;
   recipeScaling: RecipeScalingConfig;
@@ -177,6 +184,13 @@ export const siteConfig: SiteConfig = {
   },
 
   features: {
+    // Theme toggle (dark/light/system)
+    theme: {
+      enabled: true,
+      default: 'dark',
+      allowSystem: true,
+    },
+
     // Core recipe features (enabled by default)
     search: {
       enabled: true,

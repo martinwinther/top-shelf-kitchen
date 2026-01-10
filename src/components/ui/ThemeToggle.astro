@@ -1,0 +1,220 @@
+---
+/**
+ * ThemeToggle - Segmented control for dark/light/system theme switching
+ * 
+ * Minimal JS implementation, keyboard accessible.
+ * Only renders when theme.enabled is true.
+ */
+
+import { siteConfig } from '../../config/site';
+
+const { enabled, default: defaultTheme, allowSystem } = siteConfig.features.theme;
+
+// Don't render if theme toggle is disabled
+if (!enabled) {
+  return null;
+}
+---
+
+<div class="theme-toggle" role="radiogroup" aria-label="Theme preference" data-theme-toggle>
+  <button
+    type="button"
+    class="theme-toggle-btn"
+    data-theme-choice="dark"
+    aria-checked="false"
+    role="radio"
+    aria-label="Dark theme"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+  <button
+    type="button"
+    class="theme-toggle-btn"
+    data-theme-choice="light"
+    aria-checked="false"
+    role="radio"
+    aria-label="Light theme"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </button>
+  {allowSystem && (
+    <button
+      type="button"
+      class="theme-toggle-btn"
+      data-theme-choice="system"
+      aria-checked="false"
+      role="radio"
+      aria-label="System theme"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+        <line x1="8" y1="21" x2="16" y2="21"></line>
+        <line x1="12" y1="17" x2="12" y2="21"></line>
+      </svg>
+    </button>
+  )}
+</div>
+
+<script define:vars={{ defaultTheme, allowSystem }}>
+  (function() {
+    const STORAGE_KEY = 'tsk.theme';
+    const toggle = document.querySelector('[data-theme-toggle]');
+    if (!toggle) return;
+
+    const buttons = toggle.querySelectorAll('[data-theme-choice]');
+    
+    function getStoredTheme() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored === 'dark' || stored === 'light' || (allowSystem && stored === 'system')) {
+          return stored;
+        }
+      } catch (e) {}
+      return defaultTheme;
+    }
+
+    function resolveTheme(choice) {
+      if (choice === 'system') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      return choice;
+    }
+
+    function applyTheme(choice) {
+      const resolved = resolveTheme(choice);
+      document.documentElement.dataset.theme = resolved;
+      document.documentElement.style.colorScheme = resolved;
+    }
+
+    function persistTheme(choice) {
+      try {
+        localStorage.setItem(STORAGE_KEY, choice);
+      } catch (e) {}
+    }
+
+    function updateButtonStates(activeChoice) {
+      buttons.forEach(btn => {
+        const choice = btn.getAttribute('data-theme-choice');
+        const isActive = choice === activeChoice;
+        btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
+        btn.classList.toggle('active', isActive);
+      });
+    }
+
+    function handleClick(e) {
+      const btn = e.target.closest('[data-theme-choice]');
+      if (!btn) return;
+
+      const choice = btn.getAttribute('data-theme-choice');
+      persistTheme(choice);
+      applyTheme(choice);
+      updateButtonStates(choice);
+    }
+
+    function handleKeyDown(e) {
+      const choices = Array.from(buttons).map(b => b.getAttribute('data-theme-choice'));
+      const current = getStoredTheme();
+      const currentIndex = choices.indexOf(current);
+      
+      let nextIndex = currentIndex;
+      
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        nextIndex = (currentIndex + 1) % choices.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        nextIndex = (currentIndex - 1 + choices.length) % choices.length;
+      }
+
+      if (nextIndex !== currentIndex) {
+        const newChoice = choices[nextIndex];
+        persistTheme(newChoice);
+        applyTheme(newChoice);
+        updateButtonStates(newChoice);
+        buttons[nextIndex].focus();
+      }
+    }
+
+    // Initialize
+    const currentTheme = getStoredTheme();
+    updateButtonStates(currentTheme);
+
+    // Event listeners
+    toggle.addEventListener('click', handleClick);
+    toggle.addEventListener('keydown', handleKeyDown);
+
+    // Listen for system theme changes when "system" is selected
+    if (allowSystem) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      mediaQuery.addEventListener('change', () => {
+        if (getStoredTheme() === 'system') {
+          applyTheme('system');
+        }
+      });
+    }
+  })();
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 9999px;
+    padding: 0.25rem;
+    gap: 0.125rem;
+  }
+
+  .theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .theme-toggle-btn:hover {
+    color: var(--text);
+    background: var(--glass-bg-hover);
+  }
+
+  .theme-toggle-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .theme-toggle-btn.active,
+  .theme-toggle-btn[aria-checked="true"] {
+    color: var(--text);
+    background: var(--glass-bg-hover);
+  }
+
+  .theme-toggle-btn svg {
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle-btn {
+      transition: none;
+    }
+  }
+</style>

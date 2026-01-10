@@ -7,6 +7,7 @@ import AdsenseHead from '../components/ads/AdsenseHead.astro';
 import AdSlot from '../components/ads/AdSlot.astro';
 import ConsentBanner from '../components/legal/ConsentBanner.astro';
 import AnalyticsLoader from '../components/analytics/AnalyticsLoader.astro';
+import ThemeToggle from '../components/ui/ThemeToggle.astro';
 
 interface Props {
   title?: string;
@@ -47,6 +48,9 @@ const currentPath = Astro.url.pathname;
 
 // Feature flags
 const showSearch = siteConfig.features.search.enabled;
+const showThemeToggle = siteConfig.features.theme.enabled;
+const themeDefault = siteConfig.features.theme.default;
+const themeAllowSystem = siteConfig.features.theme.allowSystem;
 const showAds = siteConfig.features.ads.enabled;
 const showSidebarAd = showAds && siteConfig.features.ads.slots.sidebar;
 const showBottomBannerAd = showAds && siteConfig.features.ads.slots.bottomBanner;
@@ -90,6 +94,25 @@ const currentYear = new Date().getFullYear();
 <!doctype html>
 <html lang={siteConfig.site.locale}>
   <head>
+    {/* Theme bootstrap - prevents flash of wrong theme */}
+    <script is:inline define:vars={{ themeDefault, themeAllowSystem }}>
+      (function() {
+        var STORAGE_KEY = 'tsk.theme';
+        var choice = themeDefault;
+        try {
+          var stored = localStorage.getItem(STORAGE_KEY);
+          if (stored === 'dark' || stored === 'light' || (themeAllowSystem && stored === 'system')) {
+            choice = stored;
+          }
+        } catch (e) {}
+        var resolved = choice;
+        if (choice === 'system') {
+          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.style.colorScheme = resolved;
+      })();
+    </script>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -155,6 +178,7 @@ const currentYear = new Date().getFullYear();
                 </a>
               ))}
             </nav>
+            {showThemeToggle && <ThemeToggle />}
             {showSearch && <SearchButton />}
           </div>
         </div>
@@ -394,7 +418,7 @@ const currentYear = new Date().getFullYear();
 
   .nav-pill-item:hover {
     color: var(--text);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--glass-bg-hover);
   }
 
   .nav-pill-item:focus-visible {
@@ -404,7 +428,7 @@ const currentYear = new Date().getFullYear();
 
   .nav-pill-item--active {
     color: var(--text);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg-hover);
     /* Accessibility: accent indicator for active state */
     box-shadow: inset 0 -2px 0 0 var(--accent);
   }
