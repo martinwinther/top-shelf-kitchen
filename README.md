@@ -331,13 +331,6 @@ The main layout is `src/layouts/SiteLayout.astro`. It includes:
 - Footer
 - Consent banner (conditional)
 
-## Documentation
-
-- `docs/design.md` - Design principles, stack, content model
-- `docs/settings.md` - Feature toggles reference
-- `docs/SETUP.md` - Step-by-step setup guide
-- `docs/SHIP-CHECKLIST.md` - Pre-launch checklist
-
 ## License
 
 See [LICENSE](./LICENSE) for details.
