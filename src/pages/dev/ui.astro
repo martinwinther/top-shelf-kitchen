@@ -5,7 +5,6 @@ import Button from '../../components/ui/Button.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Toggle from '../../components/ui/Toggle.astro';
 import Modal from '../../components/ui/Modal.astro';
-import { Counter } from '../../components/react/Counter';
 import { siteConfig } from '../../config/site';
 
 // Gate this route behind dev config
@@ -86,16 +85,6 @@ if (!siteConfig.features.dev.showUiDemo) {
       </GlassCard>
     </section>
 
-    <section class="section">
-      <h2 class="demo-title">React Components</h2>
-      <GlassCard>
-        <div class="demo-content">
-          <div class="demo-group">
-            <Counter client:load />
-          </div>
-        </div>
-      </GlassCard>
-    </section>
   </div>
 
   <Modal id="demo-modal" title="Demo Modal">
@@ -164,7 +153,3 @@ if (!siteConfig.features.dev.showUiDemo) {
     gap: 0.75rem;
   }
 </style>
-
-
-
-

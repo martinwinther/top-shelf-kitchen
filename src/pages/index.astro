@@ -1,7 +1,7 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { siteConfig } from '../config/site';
-import { getPublishedRecipes, getTotalMinutes, pickFeatured, getRecipeSlug } from '../lib/recipes';
+import { getPublishedRecipes, getTotalMinutes, getRecipesBySlugOrder, getRecipeSlug } from '../lib/recipes';
 import RecipeCard from '../components/recipes/RecipeCard.astro';
 import CategoryTile from '../components/home/CategoryTile.astro';
 import RecipeRail from '../components/home/RecipeRail.astro';
@@ -11,7 +11,7 @@ import { ctaPillClasses } from '../components/ui/classes';
 const allRecipes = await getPublishedRecipes();
 
 // Featured recipes
-const featuredRecipes = pickFeatured(allRecipes, siteConfig.content.featuredRecipeSlugs);
+const featuredRecipes = getRecipesBySlugOrder(allRecipes, siteConfig.content.featuredRecipeSlugs);
 
 // Category counts
 const categories = ['breakfast', 'lunch', 'dinner', 'dessert', 'snacks'] as const;

@@ -22,10 +22,9 @@ export function getTotalMinutes(recipe: RecipeEntry): number {
 }
 
 /**
- * Pick featured recipes by their slugs
- * Returns recipes in the order of the slugs array
+ * Get recipes by their slugs in the specified order
  */
-export function pickFeatured(
+export function getRecipesBySlugOrder(
   recipes: RecipeEntry[],
   slugs: string[]
 ): RecipeEntry[] {

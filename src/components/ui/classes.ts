@@ -157,7 +157,3 @@ export function badgeClasses({
 
   return cx(...base, ...tones[tone]);
 }
-
-
-
-

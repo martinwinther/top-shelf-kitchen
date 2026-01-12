@@ -170,8 +170,8 @@ const isDev = import.meta.env.DEV;
         if (target.closest('[data-action="manage-consent"]')) {
           e.preventDefault();
           // Try to open consent modal via global API or custom event
-          if (typeof (window as any).tskOpenConsentModal === 'function') {
-            (window as any).tskOpenConsentModal();
+          if (typeof window.tskOpenConsentModal === 'function') {
+            window.tskOpenConsentModal();
           } else {
             // Fallback: dispatch custom event
             window.dispatchEvent(new Event('tsk:open-consent'));

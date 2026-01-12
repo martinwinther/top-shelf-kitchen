@@ -7,10 +7,6 @@
  * This module runs in the browser only; guards are in place for SSR safety.
  */
 
-// ============================================================================
-// Types
-// ============================================================================
-
 export interface ConsentState {
   necessary: true; // Always true
   ads: boolean;
@@ -19,17 +15,9 @@ export interface ConsentState {
   updatedAt: string;
 }
 
-// ============================================================================
-// Constants
-// ============================================================================
-
 export const CONSENT_COOKIE = 'tsk_consent';
 export const CONSENT_STORAGE = 'tsk.consent';
 const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60; // 1 year
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
@@ -113,10 +101,6 @@ function isValidConsentState(obj: unknown, version: string): obj is ConsentState
     typeof consent.updatedAt === 'string'
   );
 }
-
-// ============================================================================
-// Public API
-// ============================================================================
 
 /**
  * Returns default consent state (necessary only)

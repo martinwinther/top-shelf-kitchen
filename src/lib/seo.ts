@@ -5,7 +5,7 @@
 /**
  * Convert minutes to ISO 8601 duration format (e.g., PT15M)
  */
-export function minutesToIso8601(minutes: number): string {
+export function formatMinutesAsIsoDuration(minutes: number): string {
   return `PT${minutes}M`;
 }
 
@@ -38,7 +38,3 @@ export function formatIngredientForJsonLd(
 
   return parts.join(' ');
 }
-
-
-
-

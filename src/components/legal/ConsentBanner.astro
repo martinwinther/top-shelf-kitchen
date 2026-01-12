@@ -320,7 +320,7 @@ const { version, siteName, showAds, showAnalytics } = Astro.props;
     // -------------------------------------------------------------------------
 
     // Expose openModal globally for external triggers
-    (window as any).tskOpenConsentModal = openModal;
+    window.tskOpenConsentModal = openModal;
 
     // Listen for custom event
     window.addEventListener('tsk:open-consent', () => {

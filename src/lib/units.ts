@@ -90,13 +90,13 @@ export function normalizeUnit(unit: string): string {
 }
 
 /**
- * Formats a number cleanly:
+ * Formats an ingredient amount cleanly:
  * - Rounds to max 2 decimals
  * - Strips trailing zeros after decimal point
  * - Avoids showing -0
  * - If very close to an integer (within 0.01), rounds to integer
  */
-export function formatAmount(n: number): string {
+export function formatIngredientAmount(n: number): string {
   if (n === 0) return '';
   
   // Round to 2 decimals
@@ -294,7 +294,7 @@ export function convertNote(note: string | undefined, to: UnitSystem): string {
 
       // Preserve original spacing pattern (check if original had space)
       const hadSpace = /\s/.test(match.substring(amountStr.length));
-      return `${formatAmount(convertedAmount)}${hadSpace ? ' ' : ''}${convertedUnit}`;
+      return `${formatIngredientAmount(convertedAmount)}${hadSpace ? ' ' : ''}${convertedUnit}`;
     } else if (to === 'us' && isMetricUnit) {
       let convertedAmount: number;
       let convertedUnit: string;
@@ -330,7 +330,7 @@ export function convertNote(note: string | undefined, to: UnitSystem): string {
 
       // Preserve original spacing pattern (check if original had space)
       const hadSpace = /\s/.test(match.substring(amountStr.length));
-      return `${formatAmount(convertedAmount)}${hadSpace ? ' ' : ''}${convertedUnit}`;
+      return `${formatIngredientAmount(convertedAmount)}${hadSpace ? ' ' : ''}${convertedUnit}`;
     }
 
     // Unit already matches target system, return original

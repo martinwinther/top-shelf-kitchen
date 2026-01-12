@@ -3,7 +3,7 @@
  * RecipeJsonLd - Schema.org Recipe JSON-LD component
  */
 
-import { minutesToIso8601, formatIngredientForJsonLd } from '../../lib/seo';
+import { formatMinutesAsIsoDuration, formatIngredientForJsonLd } from '../../lib/seo';
 
 type ImageData =
   | string
@@ -56,9 +56,9 @@ const jsonLd: Record<string, unknown> = {
   recipeCategory: recipe.category,
   recipeCuisine: recipe.cuisine,
   recipeYield: `${recipe.servingsDefault} servings`,
-  prepTime: minutesToIso8601(recipe.times.prepMinutes),
-  cookTime: minutesToIso8601(recipe.times.cookMinutes),
-  totalTime: minutesToIso8601(totalMinutes),
+  prepTime: formatMinutesAsIsoDuration(recipe.times.prepMinutes),
+  cookTime: formatMinutesAsIsoDuration(recipe.times.cookMinutes),
+  totalTime: formatMinutesAsIsoDuration(totalMinutes),
   recipeIngredient: recipe.ingredients.map((ing) =>
     formatIngredientForJsonLd(ing.amount, ing.unit, ing.name, ing.note)
   ),

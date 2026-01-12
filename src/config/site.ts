@@ -3,10 +3,6 @@
  * See docs/settings.md for full documentation
  */
 
-// ============================================================================
-// Types
-// ============================================================================
-
 interface SiteInfo {
   name: string;
   tagline: string;
@@ -161,10 +157,6 @@ export interface SiteConfig {
   features: FeaturesConfig;
 }
 
-// ============================================================================
-// Configuration
-// ============================================================================
-
 export const siteConfig: SiteConfig = {
   site: {
     name: 'Top Shelf Kitchen',
@@ -184,14 +176,12 @@ export const siteConfig: SiteConfig = {
   },
 
   features: {
-    // Theme toggle (dark/light/system)
     theme: {
       enabled: true,
       default: 'dark',
       allowSystem: true,
     },
 
-    // Core recipe features (enabled by default)
     search: {
       enabled: true,
       provider: 'pagefind',
@@ -221,7 +211,6 @@ export const siteConfig: SiteConfig = {
       socialLinks: false,
     },
 
-    // Monetization & engagement (disabled by default for template)
     ads: {
       enabled: false,
       provider: 'adsense',
@@ -230,9 +219,9 @@ export const siteConfig: SiteConfig = {
         bottomBanner: true,
       },
       adsense: {
-        clientId: '', // e.g., 'ca-pub-XXXXXXXXXXXXXXXX'
-        sidebarSlotId: '', // e.g., '1234567890'
-        bottomSlotId: '', // e.g., '0987654321'
+        clientId: '',
+        sidebarSlotId: '',
+        bottomSlotId: '',
       },
       personalization: 'nonPersonalizedByDefault',
     },
@@ -250,16 +239,16 @@ export const siteConfig: SiteConfig = {
       enabled: false,
       provider: 'giscus',
       giscus: {
-        repo: '', // e.g., 'username/repo'
-        repoId: '', // from giscus.app setup
-        category: '', // e.g., 'Announcements'
-        categoryId: '', // from giscus.app setup
+        repo: '',
+        repoId: '',
+        category: '',
+        categoryId: '',
         mapping: 'pathname',
         strict: true,
         reactionsEnabled: true,
         emitMetadata: false,
         inputPosition: 'bottom',
-        theme: 'noborder_dark', // Matches our dark glass aesthetic
+        theme: 'noborder_dark',
         lang: 'en',
       },
     },
@@ -279,36 +268,29 @@ export const siteConfig: SiteConfig = {
       showOnRecipes: false,
     },
 
-    // SEO features (enabled by default)
     seo: {
       sitemap: true,
       robots: true,
       ogImages: true,
       jsonLdRecipe: true,
       defaultDescription: 'Curated recipes for people tired of fluffy food-blog filler. Every recipe is a banger.',
-      twitterHandle: '', // e.g., '@topshelfkitchen'
-      ogImagePath: '/og/default.png', // Can be missing, will be generated later
+      twitterHandle: '',
+      ogImagePath: '/og/default.png',
     },
 
-    // Legal compliance
     legal: {
-      consentBanner: true, // Shows if ads or analytics enabled
-      consentVersion: '1', // Bump to force consent renewal
+      consentBanner: true,
+      consentVersion: '1',
       privacyPage: true,
       cookiePage: true,
     },
 
-    // Development options
     dev: {
       showDrafts: false,
       showUiDemo: false,
     },
   },
 };
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
 
 /**
  * Get a specific feature flag value
@@ -351,10 +333,6 @@ export function shouldShowConsentBanner(): boolean {
   const { legal, ads, analytics } = siteConfig.features;
   return legal.consentBanner && (ads.enabled || analytics.enabled);
 }
-
-// ============================================================================
-// Exports
-// ============================================================================
 
 export default siteConfig;
 

@@ -1,27 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { buttonClasses } from '../ui/classes';
-import { convertIngredient, convertNote, formatAmount, type UnitSystem } from '../../lib/units';
+import { convertIngredient, convertNote, formatIngredientAmount, type UnitSystem } from '../../lib/units';
+import { usePrefersReducedMotion } from '../../lib/hooks/usePrefersReducedMotion';
 
-/**
- * Hook to detect prefers-reduced-motion preference
- */
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
-
-  return prefersReducedMotion;
-}
+const MIN_SERVINGS = 1;
+const MAX_SERVINGS = 16;
 
 interface Ingredient {
   amount: number;
@@ -149,14 +132,14 @@ export function CookingMode({
 
     const requestWakeLock = async () => {
       try {
-        sentinel = await (navigator as any).wakeLock.request('screen');
+        sentinel = await navigator.wakeLock!.request('screen');
         setWakeLock(sentinel);
 
         // Reacquire on visibility change (best effort)
         const handleVisibilityChange = async () => {
           if (document.visibilityState === 'visible' && sentinel === null && isOpen) {
             try {
-              sentinel = await (navigator as any).wakeLock.request('screen');
+              sentinel = await navigator.wakeLock!.request('screen');
               setWakeLock(sentinel);
             } catch (error) {
               // Ignore errors
@@ -270,11 +253,11 @@ export function CookingMode({
   };
 
   const handleDecrementServings = () => {
-    setServings((prev) => Math.max(1, prev - 1));
+    setServings((prev) => Math.max(MIN_SERVINGS, prev - 1));
   };
 
   const handleIncrementServings = () => {
-    setServings((prev) => Math.min(16, prev + 1));
+    setServings((prev) => Math.min(MAX_SERVINGS, prev + 1));
   };
 
   // Calculate scaled and converted ingredients
@@ -298,7 +281,7 @@ export function CookingMode({
       note = convertNote(note, unitSystem);
     }
 
-    const formattedAmount = formatAmount(amount);
+    const formattedAmount = formatIngredientAmount(amount);
 
     return {
       ...ingredient,
@@ -360,7 +343,7 @@ export function CookingMode({
                 <button
                   type="button"
                   onClick={handleDecrementServings}
-                  disabled={servings <= 1}
+                  disabled={servings <= MIN_SERVINGS}
                   className={buttonClasses({ variant: 'secondary', size: 'sm' })}
                   aria-label="Decrease servings"
                 >
@@ -372,7 +355,7 @@ export function CookingMode({
                 <button
                   type="button"
                   onClick={handleIncrementServings}
-                  disabled={servings >= 16}
+                  disabled={servings >= MAX_SERVINGS}
                   className={buttonClasses({ variant: 'secondary', size: 'sm' })}
                   aria-label="Increase servings"
                 >

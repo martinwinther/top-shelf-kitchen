@@ -1,27 +1,7 @@
 import { useEffect, useState } from 'react';
 import { buttonClasses } from '../ui/classes';
-import { convertIngredient, convertNote, formatAmount, type UnitSystem } from '../../lib/units';
-
-/**
- * Hook to detect prefers-reduced-motion preference
- */
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
-
-  return prefersReducedMotion;
-}
+import { convertIngredient, convertNote, formatIngredientAmount, type UnitSystem } from '../../lib/units';
+import { usePrefersReducedMotion } from '../../lib/hooks/usePrefersReducedMotion';
 
 interface Ingredient {
   amount: number;
@@ -251,7 +231,7 @@ export function RecipeIngredientsScaler({
             }
 
             // Step 4: Format amount
-            const formattedAmount = formatAmount(amount);
+            const formattedAmount = formatIngredientAmount(amount);
 
             return (
               <li key={index} className="flex flex-wrap items-baseline gap-2 text-[color:var(--text)] leading-relaxed text-lg">
