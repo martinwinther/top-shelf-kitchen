@@ -140,6 +140,11 @@ const formatCategory = (cat: string): string => {
     line-height: 1.3;
     margin: 0;
     color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.25rem;
   }
 
   .recipe-card-description {
@@ -189,6 +194,7 @@ const formatCategory = (cat: string): string => {
   @media (min-width: 768px) {
     .recipe-card-title {
       font-size: 1.375rem;
+      min-height: 3.575rem;
     }
   }
 </style>
