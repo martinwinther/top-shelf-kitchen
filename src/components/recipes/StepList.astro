@@ -1,6 +1,7 @@
 ---
 /**
  * StepList - Numbered list of recipe steps with big readable text
+ * Click a step to toggle strikethrough (mark as complete)
  */
 
 import GlassCard from '../ui/GlassCard.astro';
@@ -15,13 +16,52 @@ const { steps } = Astro.props;
 <section class="step-section">
   <h2 class="section-title">Instructions</h2>
   <GlassCard>
-    <ol class="step-list">
-      {steps.map((step) => (
-        <li class="step-item">{step}</li>
+    <ol class="step-list" data-step-list>
+      {steps.map((step, index) => (
+        <li 
+          class="step-item" 
+          data-step-index={index}
+          role="button"
+          tabindex="0"
+          aria-pressed="false"
+        >
+          {step}
+        </li>
       ))}
     </ol>
   </GlassCard>
 </section>
+
+<script>
+  function initStepList() {
+    const stepLists = document.querySelectorAll('[data-step-list]');
+    
+    stepLists.forEach((list) => {
+      const steps = list.querySelectorAll('[data-step-index]');
+      
+      steps.forEach((step) => {
+        const handleToggle = () => {
+          const isCompleted = step.classList.toggle('completed');
+          step.setAttribute('aria-pressed', String(isCompleted));
+        };
+        
+        step.addEventListener('click', handleToggle);
+        step.addEventListener('keydown', (e) => {
+          if (e instanceof KeyboardEvent && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            handleToggle();
+          }
+        });
+      });
+    });
+  }
+
+  // Run on initial load
+  initStepList();
+  
+  // Re-run on client-side navigation (Astro view transitions)
+  document.addEventListener('astro:page-load', initStepList);
+</script>
 
 <style>
   .step-section {
@@ -50,6 +90,21 @@ const { steps } = Astro.props;
     line-height: 1.7;
     font-size: 1.125rem;
     padding-left: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s ease, text-decoration-color 0.2s ease;
+  }
+
+  .step-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .step-item.completed {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent);
+    opacity: 0.6;
   }
 
   .step-item::marker {
@@ -58,9 +113,24 @@ const { steps } = Astro.props;
     font-size: 1.25rem;
   }
 
+  .step-item.completed::marker {
+    opacity: 0.6;
+  }
+
   @media (min-width: 768px) {
     .step-item {
       font-size: 1.25rem;
+    }
+  }
+
+  @media print {
+    .step-item {
+      cursor: default;
+    }
+    
+    .step-item.completed {
+      text-decoration: none;
+      opacity: 1;
     }
   }
 </style>
