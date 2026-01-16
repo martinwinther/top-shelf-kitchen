@@ -77,11 +77,8 @@ const normalizedImage = normalizeImage(image, imageAlt);
       <img 
         src={normalizedImage.src} 
         alt={normalizedImage.alt}
-        width={normalizedImage.width}
-        height={normalizedImage.height}
         loading="lazy"
         decoding="async"
-        style={normalizedImage.width && normalizedImage.height ? 'height: auto;' : undefined}
       />
     </div>
   )}
@@ -130,12 +127,27 @@ const normalizedImage = normalizeImage(image, imageAlt);
     width: 100%;
     border-radius: var(--radius-xl);
     overflow: hidden;
+    /* Fixed aspect ratio ensures consistent sizing regardless of source image */
+    aspect-ratio: 4 / 3;
+    max-height: 50vh;
   }
 
   .recipe-hero-image img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    /* Cover ensures image fills container while maintaining aspect ratio */
+    object-fit: cover;
+    /* Position focus toward center-top where food is usually featured */
+    object-position: center 25%;
+  }
+
+  /* Desktop: use wider aspect ratio, tighter max-height constraint */
+  @media (min-width: 768px) {
+    .recipe-hero-image {
+      aspect-ratio: 16 / 9;
+      max-height: 400px;
+    }
   }
 
   .recipe-hero-content {
