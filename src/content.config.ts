@@ -8,14 +8,6 @@ const recipeCategories = ['breakfast', 'lunch', 'dinner', 'dessert', 'snacks'] a
 // Difficulty levels
 const difficultyLevels = ['easy', 'medium', 'hard'] as const;
 
-// Ingredient schema - used within recipe schema
-const ingredientSchema = z.object({
-	amount: z.number().describe('Amount of the ingredient'),
-	unit: z.string().optional().describe('Unit of measurement (e.g., "g", "ml", "cups")'),
-	name: z.string().describe('Name of the ingredient'),
-	note: z.string().optional().describe('Optional note about the ingredient (e.g., "minced", "chopped")'),
-});
-
 // Image schema - supports both string (backwards compatible) and object (with dimensions)
 const imageSchema = z.union([
 	z.string().describe('Path to recipe image (legacy string format)'),
@@ -47,8 +39,6 @@ const recipeSchema = z.object({
 		})
 		.describe('Time breakdown for the recipe'),
 	difficulty: z.enum(difficultyLevels).optional().describe('Recipe difficulty level'),
-	ingredients: z.array(ingredientSchema).min(1).describe('List of ingredients with amounts and units'),
-	steps: z.array(z.string()).min(1).describe('Cooking steps (array of strings)'),
 	tags: z.array(z.string()).optional().describe('Tags for categorization and search'),
 	status: z.enum(['draft', 'published']).describe('Publication status'),
 	publishedAt: z.coerce.date().describe('Publication date (ISO format: YYYY-MM-DD)'),

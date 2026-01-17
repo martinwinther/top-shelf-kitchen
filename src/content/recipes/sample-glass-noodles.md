@@ -11,34 +11,6 @@ times:
   prepMinutes: 10
   cookMinutes: 8
 difficulty: "easy"
-ingredients:
-  - amount: 200
-    unit: "g"
-    name: "glass noodles"
-  - amount: 2
-    unit: "tbsp"
-    name: "soy sauce"
-  - amount: 1
-    unit: "tbsp"
-    name: "sesame oil"
-  - amount: 3
-    unit: "cloves"
-    name: "garlic"
-    note: "minced"
-  - amount: 1
-    name: "spring onion"
-    note: "sliced"
-  - amount: 0.5
-    unit: "tsp"
-    name: "chili flakes"
-    note: "optional"
-steps:
-  - "Soak glass noodles in warm water for 8-10 minutes until soft. Drain and set aside."
-  - "Heat sesame oil in a large pan or wok over medium heat."
-  - "Add minced garlic and sauté for 30 seconds until fragrant."
-  - "Add drained noodles and soy sauce. Toss to combine."
-  - "Stir-fry for 3-4 minutes until noodles are heated through."
-  - "Remove from heat and garnish with spring onion and chili flakes if using."
 tags:
   - "quick"
   - "vegetarian"
@@ -47,10 +19,42 @@ status: "published"
 publishedAt: "2024-11-20"
 ---
 
+## Ingredients
+
+```yaml
+- amount: 200
+  unit: "g"
+  name: "glass noodles"
+- amount: 2
+  unit: "tbsp"
+  name: "soy sauce"
+- amount: 1
+  unit: "tbsp"
+  name: "sesame oil"
+- amount: 3
+  unit: "cloves"
+  name: "garlic"
+  note: "minced"
+- amount: 1
+  name: "spring onion"
+  note: "sliced"
+- amount: 0.5
+  unit: "tsp"
+  name: "chili flakes"
+  note: "optional"
+```
+
+## Steps
+
+1. Soak glass noodles in warm water for 8-10 minutes until soft. Drain and set aside.
+2. Heat sesame oil in a large pan or wok over medium heat.
+3. Add minced garlic and sauté for 30 seconds until fragrant.
+4. Add drained noodles and soy sauce. Toss to combine.
+5. Stir-fry for 3-4 minutes until noodles are heated through.
+6. Remove from heat and garnish with spring onion and chili flakes if using.
+
+---
+
 ![Glass noodles being stir-fried in a wok](https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=600&q=80)
 
 Serve immediately while hot. Works well as a side dish or add protein for a complete meal.
-
-
-
-

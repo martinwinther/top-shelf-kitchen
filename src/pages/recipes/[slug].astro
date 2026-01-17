@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { getPublishedRecipes, getRecipeSlug } from '../../lib/recipes';
+import { parseRecipeContent } from '../../lib/recipeParser';
 import { siteConfig } from '../../config/site';
 import GlassCard from '../../components/ui/GlassCard.astro';
 import RecipeHero from '../../components/recipes/RecipeHero.astro';
@@ -38,6 +39,9 @@ const slug = getRecipeSlug(recipe);
 // Get rendered content from the entry
 const { Content } = await render(recipe);
 
+// Parse ingredients and steps from the markdown body
+const { ingredients, steps } = parseRecipeContent(recipe.body ?? '');
+
 // SEO metadata
 const title = recipe.data.title;
 const description = recipe.data.description;
@@ -64,6 +68,8 @@ const ogImage = recipe.data.image
         siteUrl={siteConfig.site.url}
         slug={slug}
         recipe={recipe.data}
+        ingredients={ingredients}
+        steps={steps}
         ogImagesEnabled={siteConfig.features.seo.ogImages}
       />
     )}
@@ -90,8 +96,8 @@ const ogImage = recipe.data.image
           client:load
           slug={slug}
           title={recipe.data.title}
-          ingredients={recipe.data.ingredients}
-          steps={recipe.data.steps}
+          ingredients={ingredients}
+          steps={steps}
           unitToggleEnabled={siteConfig.features.unitToggle.enabled}
           scalingEnabled={siteConfig.features.recipeScaling.enabled}
           defaultUnitSystem={siteConfig.features.unitToggle.default}
@@ -111,7 +117,7 @@ const ogImage = recipe.data.image
             client:load
             slug={slug}
             baseServings={recipe.data.servingsDefault}
-            ingredients={recipe.data.ingredients}
+            ingredients={ingredients}
             scalingEnabled={siteConfig.features.recipeScaling.enabled}
             unitToggleEnabled={siteConfig.features.unitToggle.enabled}
             defaultUnitSystem={siteConfig.features.unitToggle.default}
@@ -119,14 +125,14 @@ const ogImage = recipe.data.image
         </div>
         {/* Static ingredient list - print only */}
         <div class="print-only">
-          <IngredientList ingredients={recipe.data.ingredients} />
+          <IngredientList ingredients={ingredients} />
         </div>
       </>
     ) : (
-      <IngredientList ingredients={recipe.data.ingredients} />
+      <IngredientList ingredients={ingredients} />
     )}
 
-    <StepList steps={recipe.data.steps} />
+    <StepList steps={steps} />
 
     <section class="recipe-notes">
       <GlassCard>

@@ -11,38 +11,6 @@ times:
   prepMinutes: 5
   cookMinutes: 10
 difficulty: "easy"
-ingredients:
-  - amount: 8
-    name: "eggs"
-  - amount: 2
-    unit: "tbsp"
-    name: "butter"
-  - amount: 1
-    unit: "tbsp"
-    name: "soy sauce"
-  - amount: 1
-    unit: "tsp"
-    name: "sugar"
-  - amount: 600
-    unit: "g"
-    name: "cooked short-grain rice"
-  - amount: 2
-    unit: "tbsp"
-    name: "butter"
-    note: "for rice"
-  - amount: 1
-    unit: "tbsp"
-    name: "soy sauce"
-    note: "for rice"
-  - amount: 2
-    name: "scallions"
-    note: "thinly sliced"
-steps:
-  - "Cook rice according to package directions. Keep warm."
-  - "Whisk eggs with 1 tbsp soy sauce and sugar until just combined—don't overmix."
-  - "Melt 2 tbsp butter in a nonstick pan over low heat. Add eggs and cook slowly, stirring constantly with chopsticks or a spatula, until just set but still creamy, about 5-6 minutes."
-  - "While eggs cook, mix warm rice with remaining butter and soy sauce."
-  - "Divide rice among 4 bowls. Top with scrambled eggs and scallions. Serve immediately."
 tags:
   - "breakfast"
   - "quick"
@@ -51,10 +19,46 @@ status: "published"
 publishedAt: "2024-12-23"
 ---
 
+## Ingredients
+
+```yaml
+- amount: 8
+  name: "eggs"
+- amount: 2
+  unit: "tbsp"
+  name: "butter"
+- amount: 1
+  unit: "tbsp"
+  name: "soy sauce"
+- amount: 1
+  unit: "tsp"
+  name: "sugar"
+- amount: 600
+  unit: "g"
+  name: "cooked short-grain rice"
+- amount: 2
+  unit: "tbsp"
+  name: "butter"
+  note: "for rice"
+- amount: 1
+  unit: "tbsp"
+  name: "soy sauce"
+  note: "for rice"
+- amount: 2
+  name: "scallions"
+  note: "thinly sliced"
+```
+
+## Steps
+
+1. Cook rice according to package directions. Keep warm.
+2. Whisk eggs with 1 tbsp soy sauce and sugar until just combined—don't overmix.
+3. Melt 2 tbsp butter in a nonstick pan over low heat. Add eggs and cook slowly, stirring constantly with chopsticks or a spatula, until just set but still creamy, about 5-6 minutes.
+4. While eggs cook, mix warm rice with remaining butter and soy sauce.
+5. Divide rice among 4 bowls. Top with scrambled eggs and scallions. Serve immediately.
+
+---
+
 ![Creamy soft scrambled eggs in a pan](https://images.unsplash.com/photo-1482049016530-d79f7d6aa2c1?w=600&q=80)
 
 The key is low heat and constant stirring. Remove from heat just before eggs look fully set—they'll finish cooking from residual heat.
-
-
-
-

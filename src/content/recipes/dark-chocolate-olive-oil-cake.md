@@ -11,41 +11,6 @@ times:
   prepMinutes: 15
   cookMinutes: 35
 difficulty: "easy"
-ingredients:
-  - amount: 100
-    unit: "g"
-    name: "dark chocolate"
-    note: "70% cacao, chopped"
-  - amount: 80
-    unit: "ml"
-    name: "olive oil"
-  - amount: 100
-    unit: "g"
-    name: "sugar"
-  - amount: 2
-    name: "eggs"
-  - amount: 60
-    unit: "g"
-    name: "flour"
-  - amount: 20
-    unit: "g"
-    name: "cocoa powder"
-  - amount: 0.5
-    unit: "tsp"
-    name: "baking powder"
-  - amount: 0.25
-    unit: "tsp"
-    name: "salt"
-  - amount: 1
-    unit: "tsp"
-    name: "vanilla extract"
-steps:
-  - "Preheat oven to 175°C. Grease a 20cm round cake pan and line with parchment."
-  - "Melt chocolate in a double boiler or microwave. Let cool slightly."
-  - "Whisk olive oil and sugar until combined. Add eggs one at a time, then vanilla."
-  - "Stir in melted chocolate. Sift in flour, cocoa, baking powder, and salt. Fold until just combined."
-  - "Pour into prepared pan. Bake 30-35 minutes until a toothpick comes out with moist crumbs."
-  - "Cool in pan 10 minutes, then turn out. Serve warm or at room temperature."
 tags:
   - "dessert"
   - "vegetarian"
@@ -54,10 +19,49 @@ status: "published"
 publishedAt: "2024-12-25"
 ---
 
+## Ingredients
+
+```yaml
+- amount: 100
+  unit: "g"
+  name: "dark chocolate"
+  note: "70% cacao, chopped"
+- amount: 80
+  unit: "ml"
+  name: "olive oil"
+- amount: 100
+  unit: "g"
+  name: "sugar"
+- amount: 2
+  name: "eggs"
+- amount: 60
+  unit: "g"
+  name: "flour"
+- amount: 20
+  unit: "g"
+  name: "cocoa powder"
+- amount: 0.5
+  unit: "tsp"
+  name: "baking powder"
+- amount: 0.25
+  unit: "tsp"
+  name: "salt"
+- amount: 1
+  unit: "tsp"
+  name: "vanilla extract"
+```
+
+## Steps
+
+1. Preheat oven to 175°C. Grease a 20cm round cake pan and line with parchment.
+2. Melt chocolate in a double boiler or microwave. Let cool slightly.
+3. Whisk olive oil and sugar until combined. Add eggs one at a time, then vanilla.
+4. Stir in melted chocolate. Sift in flour, cocoa, baking powder, and salt. Fold until just combined.
+5. Pour into prepared pan. Bake 30-35 minutes until a toothpick comes out with moist crumbs.
+6. Cool in pan 10 minutes, then turn out. Serve warm or at room temperature.
+
+---
+
 ![Rich chocolate cake batter being folded](https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&q=80)
 
 Best the day it's made, but keeps well wrapped for 2 days. A small slice is intensely satisfying—this cake is rich.
-
-
-
-

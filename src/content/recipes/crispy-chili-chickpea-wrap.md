@@ -11,50 +11,6 @@ times:
   prepMinutes: 10
   cookMinutes: 15
 difficulty: "easy"
-ingredients:
-  - amount: 2
-    unit: "cans"
-    name: "chickpeas"
-    note: "400g each, drained and patted dry"
-  - amount: 2
-    unit: "tbsp"
-    name: "olive oil"
-  - amount: 1
-    unit: "tsp"
-    name: "chili powder"
-  - amount: 0.5
-    unit: "tsp"
-    name: "cumin"
-  - amount: 0.5
-    unit: "tsp"
-    name: "paprika"
-  - amount: 0
-    unit: "tsp"
-    name: "salt"
-    note: "to taste"
-  - amount: 4
-    name: "large tortillas"
-  - amount: 60
-    unit: "g"
-    name: "tahini"
-  - amount: 2
-    unit: "tbsp"
-    name: "lemon juice"
-  - amount: 1
-    unit: "clove"
-    name: "garlic"
-    note: "minced"
-  - amount: 3
-    unit: "tbsp"
-    name: "water"
-  - amount: 100
-    unit: "g"
-    name: "baby spinach"
-steps:
-  - "Heat oven to 200°C. Toss chickpeas with olive oil, chili powder, cumin, paprika, and salt. Spread on a baking sheet."
-  - "Roast for 15 minutes, shaking halfway, until crispy. Let cool slightly."
-  - "Whisk tahini, lemon juice, garlic, and water until smooth. Add more water if needed to reach drizzling consistency."
-  - "Warm tortillas. Fill each with spinach, crispy chickpeas, and a generous drizzle of tahini sauce. Fold and serve."
 tags:
   - "lunch"
   - "vegetarian"
@@ -63,10 +19,58 @@ status: "published"
 publishedAt: "2024-12-05"
 ---
 
+## Ingredients
+
+```yaml
+- amount: 2
+  unit: "cans"
+  name: "chickpeas"
+  note: "400g each, drained and patted dry"
+- amount: 2
+  unit: "tbsp"
+  name: "olive oil"
+- amount: 1
+  unit: "tsp"
+  name: "chili powder"
+- amount: 0.5
+  unit: "tsp"
+  name: "cumin"
+- amount: 0.5
+  unit: "tsp"
+  name: "paprika"
+- amount: 0
+  unit: "tsp"
+  name: "salt"
+  note: "to taste"
+- amount: 4
+  name: "large tortillas"
+- amount: 60
+  unit: "g"
+  name: "tahini"
+- amount: 2
+  unit: "tbsp"
+  name: "lemon juice"
+- amount: 1
+  unit: "clove"
+  name: "garlic"
+  note: "minced"
+- amount: 3
+  unit: "tbsp"
+  name: "water"
+- amount: 100
+  unit: "g"
+  name: "baby spinach"
+```
+
+## Steps
+
+1. Heat oven to 200°C. Toss chickpeas with olive oil, chili powder, cumin, paprika, and salt. Spread on a baking sheet.
+2. Roast for 15 minutes, shaking halfway, until crispy. Let cool slightly.
+3. Whisk tahini, lemon juice, garlic, and water until smooth. Add more water if needed to reach drizzling consistency.
+4. Warm tortillas. Fill each with spinach, crispy chickpeas, and a generous drizzle of tahini sauce. Fold and serve.
+
+---
+
 ![Crispy roasted chickpeas on a baking sheet](https://images.unsplash.com/photo-1515543904604-2b61a4ac5b8b?w=600&q=80)
 
 Chickpeas can be made ahead and stored in the fridge for 3 days. Reheat in a pan or oven before serving.
-
-
-
-

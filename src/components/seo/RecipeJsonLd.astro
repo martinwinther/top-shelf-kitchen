@@ -15,6 +15,13 @@ type ImageData =
     }
   | undefined;
 
+interface Ingredient {
+  amount: number;
+  unit?: string;
+  name: string;
+  note?: string;
+}
+
 interface Props {
   siteUrl: string;
   slug: string;
@@ -28,20 +35,15 @@ interface Props {
       prepMinutes: number;
       cookMinutes: number;
     };
-    ingredients: Array<{
-      amount: number;
-      unit?: string;
-      name: string;
-      note?: string;
-    }>;
-    steps: string[];
     image?: ImageData;
     publishedAt?: Date;
   };
+  ingredients: Ingredient[];
+  steps: string[];
   ogImagesEnabled: boolean;
 }
 
-const { siteUrl, slug, recipe, ogImagesEnabled } = Astro.props;
+const { siteUrl, slug, recipe, ingredients, steps, ogImagesEnabled } = Astro.props;
 
 const recipeUrl = `${siteUrl}/recipes/${slug}`;
 const totalMinutes = recipe.times.prepMinutes + recipe.times.cookMinutes;
@@ -59,10 +61,10 @@ const jsonLd: Record<string, unknown> = {
   prepTime: formatMinutesAsIsoDuration(recipe.times.prepMinutes),
   cookTime: formatMinutesAsIsoDuration(recipe.times.cookMinutes),
   totalTime: formatMinutesAsIsoDuration(totalMinutes),
-  recipeIngredient: recipe.ingredients.map((ing) =>
+  recipeIngredient: ingredients.map((ing) =>
     formatIngredientForJsonLd(ing.amount, ing.unit, ing.name, ing.note)
   ),
-  recipeInstructions: recipe.steps.map((step, index) => ({
+  recipeInstructions: steps.map((step, index) => ({
     '@type': 'HowToStep',
     position: index + 1,
     text: step,

@@ -11,42 +11,6 @@ times:
   prepMinutes: 10
   cookMinutes: 0
 difficulty: "easy"
-ingredients:
-  - amount: 4
-    name: "Persian cucumbers"
-    note: "or 2 English cucumbers"
-  - amount: 2
-    unit: "cloves"
-    name: "garlic"
-    note: "minced"
-  - amount: 2
-    unit: "tbsp"
-    name: "black vinegar"
-  - amount: 1
-    unit: "tbsp"
-    name: "soy sauce"
-  - amount: 1
-    unit: "tsp"
-    name: "sesame oil"
-  - amount: 1
-    unit: "tsp"
-    name: "chili oil"
-  - amount: 0.5
-    unit: "tsp"
-    name: "sugar"
-  - amount: 0
-    unit: "tsp"
-    name: "salt"
-    note: "to taste"
-  - amount: 1
-    name: "scallion"
-    note: "thinly sliced"
-steps:
-  - "Place cucumbers on a cutting board. Use the flat side of a knife or a heavy object to smash them until they crack open."
-  - "Cut smashed cucumbers into rough 2-3cm pieces. Place in a colander, sprinkle with salt, and let sit 10 minutes to draw out water."
-  - "Rinse cucumbers and pat dry with a towel. Transfer to a serving bowl."
-  - "Whisk together garlic, black vinegar, soy sauce, sesame oil, chili oil, and sugar."
-  - "Pour dressing over cucumbers. Toss well and garnish with scallion. Serve immediately or chill for 30 minutes."
 tags:
   - "lunch"
   - "side"
@@ -56,10 +20,50 @@ status: "published"
 publishedAt: "2024-12-10"
 ---
 
+## Ingredients
+
+```yaml
+- amount: 4
+  name: "Persian cucumbers"
+  note: "or 2 English cucumbers"
+- amount: 2
+  unit: "cloves"
+  name: "garlic"
+  note: "minced"
+- amount: 2
+  unit: "tbsp"
+  name: "black vinegar"
+- amount: 1
+  unit: "tbsp"
+  name: "soy sauce"
+- amount: 1
+  unit: "tsp"
+  name: "sesame oil"
+- amount: 1
+  unit: "tsp"
+  name: "chili oil"
+- amount: 0.5
+  unit: "tsp"
+  name: "sugar"
+- amount: 0
+  unit: "tsp"
+  name: "salt"
+  note: "to taste"
+- amount: 1
+  name: "scallion"
+  note: "thinly sliced"
+```
+
+## Steps
+
+1. Place cucumbers on a cutting board. Use the flat side of a knife or a heavy object to smash them until they crack open.
+2. Cut smashed cucumbers into rough 2-3cm pieces. Place in a colander, sprinkle with salt, and let sit 10 minutes to draw out water.
+3. Rinse cucumbers and pat dry with a towel. Transfer to a serving bowl.
+4. Whisk together garlic, black vinegar, soy sauce, sesame oil, chili oil, and sugar.
+5. Pour dressing over cucumbers. Toss well and garnish with scallion. Serve immediately or chill for 30 minutes.
+
+---
+
 ![Cucumbers being smashed with a knife](https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=600&q=80)
 
 Best eaten within a few hours. The smashing creates nooks and crannies that hold the dressing beautifully.
-
-
-
-
