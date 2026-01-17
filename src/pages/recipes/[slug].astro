@@ -1,5 +1,6 @@
 ---
-import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { type CollectionEntry } from 'astro:content';
+import { marked } from 'marked';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { getPublishedRecipes, getRecipeSlug } from '../../lib/recipes';
 import { parseRecipeContent } from '../../lib/recipeParser';
@@ -36,11 +37,12 @@ interface Props {
 
 const { recipe } = Astro.props;
 const slug = getRecipeSlug(recipe);
-// Get rendered content from the entry
-const { Content } = await render(recipe);
 
-// Parse ingredients and steps from the markdown body
-const { ingredients, steps } = parseRecipeContent(recipe.body ?? '');
+// Parse ingredients, steps, and notes from the markdown body
+const { ingredients, steps, notesMarkdown } = parseRecipeContent(recipe.body ?? '');
+
+// Render notes markdown to HTML
+const notesHtml = notesMarkdown ? await marked.parse(notesMarkdown) : '';
 
 // SEO metadata
 const title = recipe.data.title;
@@ -134,13 +136,13 @@ const ogImage = recipe.data.image
 
     <StepList steps={steps} />
 
-    <section class="recipe-notes">
-      <GlassCard>
-        <div class="recipe-notes-content">
-          <Content />
-        </div>
-      </GlassCard>
-    </section>
+    {notesHtml && (
+      <section class="recipe-notes">
+        <GlassCard>
+          <div class="recipe-notes-content" set:html={notesHtml} />
+        </GlassCard>
+      </section>
+    )}
 
     <div class="no-print">
       <RelatedRecipes currentSlug={slug} recipes={await getPublishedRecipes()} />

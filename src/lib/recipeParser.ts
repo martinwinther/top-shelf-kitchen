@@ -10,18 +10,21 @@ interface Ingredient {
 interface ParsedRecipeContent {
 	ingredients: Ingredient[];
 	steps: string[];
+	notesMarkdown: string;
 }
 
 /**
  * Parses markdown content to extract structured recipe data.
- * Expects ingredients in a YAML code block under "## Ingredients"
- * and steps as an ordered list under "## Steps".
+ * Expects ingredients in a YAML code block under "## Ingredients",
+ * steps as an ordered list under "## Steps",
+ * and notes after the "---" separator.
  */
 export function parseRecipeContent(rawContent: string): ParsedRecipeContent {
 	const ingredients = extractIngredients(rawContent);
 	const steps = extractSteps(rawContent);
+	const notesMarkdown = extractNotes(rawContent);
 
-	return { ingredients, steps };
+	return { ingredients, steps, notesMarkdown };
 }
 
 /**
@@ -91,4 +94,20 @@ function extractSteps(content: string): string[] {
 	}
 
 	return steps;
+}
+
+/**
+ * Extracts notes content from after the "---" separator.
+ * Returns raw markdown that can be rendered separately.
+ */
+function extractNotes(content: string): string {
+	// Find the horizontal rule separator (---) that comes after the Steps section
+	// The --- must be on its own line
+	const separatorMatch = content.match(/\n---\s*\n([\s\S]*?)$/);
+
+	if (!separatorMatch) {
+		return '';
+	}
+
+	return separatorMatch[1].trim();
 }
