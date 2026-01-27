@@ -47,6 +47,14 @@ publishedAt: "2024-01-15"
 - amount: 200
   unit: "ml"
   name: "water"
+- amount: 10
+  unit: "g"
+  name: "chia seeds"
+  note: "optional"
+- amount: 15
+  unit: "g"
+  name: "crushed walnuts"
+  note: "optional"
 ```
 
 ## Steps
@@ -54,7 +62,7 @@ publishedAt: "2024-01-15"
 1. Add spices to dry oats and stir to combine.
 2. Add milk and water to the oats.
 3. Cook on medium heat until almost done, stirring occasionally.
-4. Stir in berries and butter and finish cooking until porridge reaches desired consistency.
+4. Stir in berries, butter, and optional chia seeds and walnuts. Finish cooking until porridge reaches desired consistency.
 5. Serve hot.
 
 ---
@@ -63,4 +71,4 @@ publishedAt: "2024-01-15"
 
 This warming porridge is perfect for cold mornings. The combination of cinnamon, cardamom, and ginger creates a fragrant, comforting bowl. The frozen berries add a burst of sweetness and color, while the butter gives richness.
 
-You can adjust the spice amounts to your taste. If you prefer a creamier porridge, use more milk and less water. For a sweeter version, drizzle with honey or maple syrup before serving.
+You can adjust the spice amounts to your taste. If you prefer a creamier porridge, use more milk and less water. For a sweeter version, drizzle with honey or maple syrup before serving. Optional chia seeds and walnuts add extra protein, healthy fats, and texture.
