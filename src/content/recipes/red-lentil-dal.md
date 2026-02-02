@@ -77,7 +77,7 @@ publishedAt: "2024-01-15"
 
 1. Heat ghee or oil in a large pot over medium. Add onion and cook until softened, about 5 minutes. Add garlic and ginger, stir 1 minute.
 2. Add turmeric, cumin, and cayenne. Stir 30 seconds until fragrant.
-3. Add lentils, water or stock, and canned tomatoes. Bring to a boil, then reduce heat and simmer uncovered 20–25 minutes, stirring occasionally, until lentils are tender and the dal is thick and creamy.
+3. Add lentils, water or stock, and canned tomatoes. Bring to a boil, then reduce heat and simmer uncovered 35-45 minutes, stirring occasionally, until lentils are tender and the dal is thick and creamy.
 4. Season with salt. If it’s too thick, add a splash of water.
 5. Serve with rice or flatbread, topped with cilantro and lime wedges.
 
