@@ -1,24 +1,17 @@
 ---
-/**
- * NewsletterSignup - Minimalist newsletter signup module
- * 
- * Supports two modes:
- * - embed: Renders provider HTML (Mailchimp/ConvertKit/Buttondown) with scripts stripped
- * - endpoint: Renders a simple email form that posts to a configured URL
- * 
- * @example
- * <NewsletterSignup />
- * <NewsletterSignup compact />
- */
+// NewsletterSignup - Minimalist newsletter signup module
+//
+// Supports two modes:
+// - embed: Renders provider HTML (Mailchimp/ConvertKit/Buttondown) with scripts stripped
+// - endpoint: Renders a simple email form that posts to a configured URL
+//
+// @example
+// <NewsletterSignup />
+// <NewsletterSignup compact />
 
 import { siteConfig } from '../../config/site';
 import GlassCard from '../ui/GlassCard.astro';
 import Button from '../ui/Button.astro';
-
-interface Props {
-  /** Compact mode for tighter spaces (e.g., recipe pages) */
-  compact?: boolean;
-}
 
 const { compact = false } = Astro.props;
 const { newsletter } = siteConfig.features;
@@ -26,11 +19,10 @@ const { newsletter } = siteConfig.features;
 // Early return if newsletter is disabled or provider is none
 const isEnabled = newsletter.enabled && newsletter.provider !== 'none';
 
-/**
- * Sanitize embed HTML by stripping <script> tags
- * This prevents XSS attacks while preserving forms, inputs, and iframes
- */
-function sanitizeEmbedHtml(html: string): string {
+// Sanitize embed HTML by stripping <script> tags.
+// This prevents XSS attacks while preserving forms, inputs, and iframes.
+/** @param {string} html */
+function sanitizeEmbedHtml(html) {
   // Remove <script>...</script> tags (including multiline)
   return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 }
